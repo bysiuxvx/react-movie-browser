@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios"
+import React, { useEffect } from "react"
+import useStore from "./Store/store"
+import Layout from "./Layout"
+import MovieList from "./Components/MovieList"
+import Search from "./Components/Search"
+import MovieModal from "./Components/Modal"
+import "./Style/style.scss"
 
-function App() {
+const App = () => {
+  const searchValue = useStore((state) => state.searchValue)
+  const setMovieList = useStore((state) => state.setMovieList)
+
+  const favoriteList = useStore((state) => state.favoriteList)
+
+  const movieRequest = () => {
+    const key = `https://www.omdbapi.com/?s=${searchValue}&apikey=b46dc190`
+    axios
+      .get(key)
+      .then((response) => {
+        // for (const element of response.data) {
+        //   element.userRating = null
+        // }
+        // const updatedResponse = response.data.forEach(
+        //   (movie) => (movie.userRating = null)
+        // )
+        // setMovieList(updatedResponse)
+        setMovieList(response.data)
+      })
+      .catch((error) => console.log(error))
+  }
+
+  useEffect(() => {
+    movieRequest(searchValue)
+    if (searchValue === "") {
+      setMovieList([])
+    }
+  })
+
+  useEffect(() => {
+    localStorage.setItem("favoriteList", JSON.stringify(favoriteList))
+  }, [favoriteList])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {/* <Layout /> */}
+      <Search />
+      <MovieList />
+      <MovieModal />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
