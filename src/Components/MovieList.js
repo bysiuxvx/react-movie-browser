@@ -7,9 +7,9 @@ const MovieList = () => {
 
   return (
     <>
-      {movieList.Search && (
+      {movieList && (
         <div className="list-container">
-          {movieList.Search.map((movie) => (
+          {movieList.map((movie) => (
             <Movie movie={movie} key={movie.imdbID} />
           ))}
         </div>

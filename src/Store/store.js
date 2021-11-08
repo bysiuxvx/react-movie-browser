@@ -2,6 +2,7 @@ import create from "zustand"
 
 const useStore = create((set) => ({
   favoriteList: JSON.parse(localStorage.getItem("favoriteList") || "[]"),
+  ratedMovies: JSON.parse(localStorage.getItem("ratedMovies") || "[]"),
 
   searchValue: "",
   movieList: [],
@@ -15,9 +16,10 @@ const useStore = create((set) => ({
       favoriteList: [movie, ...state.favoriteList],
     }))
   },
-  // setRating: (imdbID) => {
+
+  // setUserRating: (imdbID, rating) => {
   //   set((state) => ({
-  //     favoriteList: state.favoriteList.filter(movie) => movie.,
+  //     ratedMovies: [...state.ratedMovies, ratedMovie],
   //   }))
   // },
 

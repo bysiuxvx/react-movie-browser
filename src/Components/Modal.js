@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import useStore from "../Store/store"
 import {
   Button,
@@ -8,9 +8,9 @@ import {
   Divider,
   Grid,
   Segment,
-  Row,
   Rating,
   Label,
+  Icon,
 } from "semantic-ui-react"
 
 // import FavoritesHandler from "./FavoritesHandler"
@@ -22,7 +22,17 @@ const MovieModal = () => {
   const favoriteList = useStore((state) => state.favoriteList)
   const addToFavorites = useStore((state) => state.addToFavorites)
   const removeFromFavorites = useStore((state) => state.removeFromFavorites)
+
   const modalOpen = modalDetails ? true : false
+
+  const ratedMovies = useStore((state) => state.ratedMovies)
+  const setUserRating = useStore((state) => state.setUserRating)
+
+  const [ratingChanged, setRatingChanged] = useState(false)
+
+  const movieRating = ratedMovies.find((movie) =>
+    movie.imdbID === modalDetails.imdbID ? movie.userRating : 0
+  )
 
   return (
     <>
@@ -62,8 +72,20 @@ const MovieModal = () => {
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this movie?</Label>
-                  <input type="range" min={0} max={10} />
-                  <Rating icon="star" maxRating={10} />
+                  <p>
+                    Rating: {movieRating}
+                    {/* {ratingChanged ? userMovieRating : "Haven't watched yet"} */}
+                  </p>
+                  <input
+                    type="range"
+                    min={0}
+                    max={10}
+                    // value={userMovieRating}
+                    // onChange={(event, modalDetails) => {
+                    //   setUserRating(modalDetails.imdbID, event.target.value)
+                    // }}
+                  />
+                  <Rating icon="star" value={movieRating} maxRating={10} />
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
                   {favoriteList.find(
