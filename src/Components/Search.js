@@ -15,7 +15,15 @@ const Search = (props) => {
         onChange={(event) => setSearchValue(event.target.value)}
         placeholder="Search for a movie :)"
         icon={
-          searchValue ? <Icon name="search" inverted circular link /> : null
+          searchValue ? (
+            <Icon
+              name="search"
+              inverted
+              circular
+              link
+              onClick={() => setSearchValue("")}
+            />
+          ) : null
         }
       />
     </Container>

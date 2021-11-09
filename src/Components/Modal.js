@@ -13,8 +13,6 @@ import {
   Icon,
 } from "semantic-ui-react"
 
-// import FavoritesHandler from "./FavoritesHandler"
-
 const MovieModal = () => {
   const modalDetails = useStore((state) => state.modalDetails)
   const clearModalDetails = useStore((state) => state.setModalDetails)
@@ -23,21 +21,45 @@ const MovieModal = () => {
   const addToFavorites = useStore((state) => state.addToFavorites)
   const removeFromFavorites = useStore((state) => state.removeFromFavorites)
 
-  const modalOpen = modalDetails ? true : false
-
-  const ratedMovies = useStore((state) => state.ratedMovies)
+  // const ratedMovies = useStore((state) => state.ratedMovies)
   const setUserRating = useStore((state) => state.setUserRating)
 
-  const [ratingChanged, setRatingChanged] = useState(false)
+  const ratedMovies = [
+    { imdbID: "tt2700662", userRating: 10 },
+    { imdbID: "tt6038600", userRating: 5 },
+  ]
 
-  const movieRating = ratedMovies.find((movie) =>
-    movie.imdbID === modalDetails.imdbID ? movie.userRating : 0
+  const [ratingChanged, setRatingChanged] = useState(false)
+  const [movieRating, setRating] = useState(
+    modalDetails
+      ? ratedMovies.find((movie) => movie.imdbID === modalDetails.imdbID)
+      : null
   )
+
+  // ? ratedMovies.find((movie) => movie.imdbID === modalDetails.imdbID)
+  // : null
+
+  // const movieRating = modalOpen
+  //   ? ratedMovies.find((movie) =>
+  //       movie.imdbID === modalDetails.imdbID ? movie.userRating : 0
+  //     )
+  //   : null
+
+  const changeUserMovieRating = (event) => {
+    const movieRating = {
+      imdbID: modalDetails.imdbID,
+      userRating: event.target.value,
+    }
+    setUserRating(movieRating)
+  }
 
   return (
     <>
       {modalDetails && (
-        <Modal onClose={() => clearModalDetails(null)} open={modalOpen}>
+        <Modal
+          onClose={() => clearModalDetails(null)}
+          open={modalDetails ? true : false}
+        >
           <Modal.Content image>
             <Image size="medium" src={modalDetails.Poster} wrapped />
             <Modal.Description>
@@ -64,7 +86,6 @@ const MovieModal = () => {
                     </p>
                   ))
                 : null}
-              <p>{favoriteList.length}</p>
             </Modal.Description>
           </Modal.Content>
           <Modal.Actions>
@@ -73,19 +94,28 @@ const MovieModal = () => {
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this movie?</Label>
                   <p>
-                    Rating: {movieRating}
+                    Your rating: {movieRating}
+                    {/* {movieRating === null
+                      ? "Watch it first!"
+                      : movieRating.userRating} */}
                     {/* {ratingChanged ? userMovieRating : "Haven't watched yet"} */}
+                    {/* {modalDetails.userRating === null
+                      ? "Watch it first!"
+                      : modalDetails.userRating}
+                    {ratingChanged ? userMovieRating : "Haven't watched yet"} */}
                   </p>
                   <input
                     type="range"
                     min={0}
                     max={10}
-                    // value={userMovieRating}
-                    // onChange={(event, modalDetails) => {
-                    //   setUserRating(modalDetails.imdbID, event.target.value)
-                    // }}
+                    value={
+                      modalDetails.userRating === null
+                        ? 0
+                        : modalDetails.userRating
+                    }
+                    onChange={changeUserMovieRating}
                   />
-                  <Rating icon="star" value={movieRating} maxRating={10} />
+                  {/* <Rating icon="star" value={movieRating} maxRating={10} /> */}
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
                   {favoriteList.find(
