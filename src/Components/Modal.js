@@ -76,7 +76,7 @@ const MovieModal = () => {
               {modalDetails.Ratings.length > 0 ||
               modalDetails.Ratings !== [] ? (
                 <strong>
-                  <p>Rating:</p>
+                  <p style={{ marginBottom: 10 }}>Rating:</p>
                 </strong>
               ) : null}
               {modalDetails.Ratings.length > 0 || modalDetails.Ratings !== []

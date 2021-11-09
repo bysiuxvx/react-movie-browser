@@ -5,14 +5,14 @@ const useStore = create((set) => ({
   ratedMovies: JSON.parse(localStorage.getItem("ratedMovies") || "[]"),
 
   searchValue: "",
-  sidebarVisible: true,
+  sidebarVisible: false,
   movieList: [],
   modalDetails: null,
 
   setSearchValue: (value) => set({ searchValue: value }),
   setMovieList: (list) => set({ movieList: list }),
   setModalDetails: (details) => set({ modalDetails: details }),
-  setSidebarVisible: (sidebarVisible) => set(!sidebarVisible),
+  setSidebarVisible: (value) => set({ sidebarVisible: value }),
 
   addToFavorites: (movie) => {
     set((state) => ({

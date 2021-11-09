@@ -1,14 +1,14 @@
 import axios from "axios"
 import React, { useEffect, useState } from "react"
 import useStore from "./Store/store"
-import Layout from "./Layout"
 import MovieList from "./Components/MovieList"
 import Search from "./Components/Search"
 import MovieModal from "./Components/Modal"
 import "./Style/style.scss"
 
-import { Segment, Sidebar } from "semantic-ui-react"
+import { Segment, Button } from "semantic-ui-react"
 import FavoritesSidebar from "./Components/FavoritesSidebar"
+import SidebarToggler from "./Components/SidebarToggler"
 
 const App = () => {
   const searchValue = useStore((state) => state.searchValue)
@@ -57,12 +57,13 @@ const App = () => {
 
   return (
     <div className="App">
-      {favoriteList.length ? <FavoritesSidebar /> : null}
+      <FavoritesSidebar />
       {/* <Sidebar.Pusher dimmed={sidebarVisible} inverted> */}
       <Segment basic>
         <Search />
         {movieList.length === 0 ? null : <MovieList />}
         <MovieModal />
+        {favoriteList.length ? <SidebarToggler /> : null}
       </Segment>
       {/* </Sidebar.Pusher> */}
     </div>

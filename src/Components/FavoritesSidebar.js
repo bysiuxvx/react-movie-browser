@@ -13,8 +13,9 @@ const FavoritesSidebar = () => {
       animation="overlay"
       inverted
       vertical
-      visible={sidebarVisible}
+      visible={favoriteList.length > 0 ? sidebarVisible : false}
     >
+      <h3>Your favorite movies!</h3>
       {favoriteList.length > 0
         ? favoriteList.map((movie) => (
             <FavoriteElement key={movie.imdbID} movie={movie} />
