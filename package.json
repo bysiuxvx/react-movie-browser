@@ -1,7 +1,7 @@
 {
   "name": "movie-browser",
   "version": "0.1.0",
-  "homepage": "http://bysiuxvx.github.io/movie-browser",
+  "homepage": "http://bysiuxvx.github.io/react-movie-browser",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",

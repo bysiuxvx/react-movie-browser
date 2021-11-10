@@ -17,7 +17,7 @@ const Search = (props) => {
         icon={
           searchValue ? (
             <Icon
-              name="search"
+              name="remove"
               inverted
               circular
               link

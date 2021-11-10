@@ -9,7 +9,7 @@ Both favorites and rated movies are saved in the local storage, so that when you
 
 PL:
 Przeglądarka filmów  
-Możliwe jest zapisywanie wybranych filmów do ulubionych, a także ocenianie filmów.
+Możliwe jest zapisywanie wybranych filmów do ulubionych, a także ocenianie ich.
 Zarówno ulubione, jak i ocenione filmy są zapisywane w pamięci lokalnej, dzięki czemu po powrocie do aplikacji lista ulubionych i oceny są nadal zachowane.
 
 ## Demo
