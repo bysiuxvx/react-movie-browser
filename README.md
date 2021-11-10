@@ -14,6 +14,7 @@ Zarówno ulubione, jak i ocenione filmy są zapisywane w pamięci lokalnej, dzi�
 
 ## Demo
 
+- [Gh-pages](https://bysiuxvx.github.io/react-movie-browser/)
 - [Heroku](https://react-movie-browser.herokuapp.com/)
 
 ## Technologies:
