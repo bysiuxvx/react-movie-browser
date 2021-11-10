@@ -28,30 +28,6 @@ const SidebarToggler = () => {
         Show favorites
       </Button>
     )
-
-  //   return (
-  //     <>
-  //       {sidebarVidisble ? (
-  //         <Button
-  //           inverted
-  //           color="grey"
-  //           className="sidebar-toggle"
-  //           onClick={() => setSidebarVisible(false)}
-  //         >
-  //           Hide favorites
-  //         </Button>
-  //       ) : (
-  //   <Button
-  //     inverted
-  //     color="grey"
-  //     className="sidebar-toggle"
-  //     onClick={() => setSidebarVisible(true)}
-  //   >
-  //     Show favorites
-  //   </Button>
-  // )}
-  //     </>
-  //   )
 }
 
 export default SidebarToggler

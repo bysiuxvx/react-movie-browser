@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import useStore from "../Store/store"
 import {
   Button,
@@ -8,9 +8,8 @@ import {
   Divider,
   Grid,
   Segment,
-  Rating,
   Label,
-  Icon,
+  Rating,
 } from "semantic-ui-react"
 
 const MovieModal = () => {
@@ -21,37 +20,21 @@ const MovieModal = () => {
   const addToFavorites = useStore((state) => state.addToFavorites)
   const removeFromFavorites = useStore((state) => state.removeFromFavorites)
 
-  // const ratedMovies = useStore((state) => state.ratedMovies)
-  const setUserRating = useStore((state) => state.setUserRating)
-
-  const ratedMovies = [
-    { imdbID: "tt2700662", userRating: 10 },
-    { imdbID: "tt6038600", userRating: 5 },
-  ]
-
-  const [ratingChanged, setRatingChanged] = useState(false)
-  const [movieRating, setRating] = useState(
-    modalDetails
-      ? ratedMovies.find((movie) => movie.imdbID === modalDetails.imdbID)
-      : null
-  )
-
-  // ? ratedMovies.find((movie) => movie.imdbID === modalDetails.imdbID)
-  // : null
-
-  // const movieRating = modalOpen
-  //   ? ratedMovies.find((movie) =>
-  //       movie.imdbID === modalDetails.imdbID ? movie.userRating : 0
-  //     )
-  //   : null
-
+  const ratedMovies = useStore((state) => state.ratedMovies)
+  const addUserRating = useStore((state) => state.addUserRating)
   const changeUserMovieRating = (event) => {
-    const movieRating = {
+    const newRating = {
       imdbID: modalDetails.imdbID,
       userRating: event.target.value,
+      ratedBefore: true,
     }
-    setUserRating(movieRating)
+    let currentRatings = ratedMovies
+    let newState = Object.assign({}, currentRatings)
+    newState[newRating.imdbID] = newRating.userRating
+    addUserRating(newState)
   }
+
+  const movieRating = modalDetails ? ratedMovies[modalDetails.imdbID] : null
 
   return (
     <>
@@ -61,7 +44,7 @@ const MovieModal = () => {
           open={modalDetails ? true : false}
         >
           <Modal.Content image>
-            <Image size="medium" src={modalDetails.Poster} wrapped />
+            <Image size="big" src={modalDetails.Poster} wrapped />
             <Modal.Description>
               <Header>
                 {modalDetails.Title} {modalDetails.Year}
@@ -93,29 +76,26 @@ const MovieModal = () => {
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this movie?</Label>
-                  <p>
-                    Your rating: {movieRating}
-                    {/* {movieRating === null
-                      ? "Watch it first!"
-                      : movieRating.userRating} */}
-                    {/* {ratingChanged ? userMovieRating : "Haven't watched yet"} */}
-                    {/* {modalDetails.userRating === null
-                      ? "Watch it first!"
-                      : modalDetails.userRating}
-                    {ratingChanged ? userMovieRating : "Haven't watched yet"} */}
+                  <p style={{ margin: "7px 0" }}>
+                    Your rating:{" "}
+                    {movieRating
+                      ? movieRating
+                      : "You haven't rated it yet. Did you like it?"}
                   </p>
                   <input
                     type="range"
                     min={0}
                     max={10}
-                    value={
-                      modalDetails.userRating === null
-                        ? 0
-                        : modalDetails.userRating
-                    }
+                    value={movieRating ? movieRating : 0}
                     onChange={changeUserMovieRating}
                   />
-                  {/* <Rating icon="star" value={movieRating} maxRating={10} /> */}
+                  <br />
+                  <br />
+                  <Rating
+                    icon="star"
+                    rating={movieRating ? movieRating : 0}
+                    maxRating={10}
+                  />
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
                   {favoriteList.find(

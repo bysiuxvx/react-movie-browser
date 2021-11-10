@@ -2,7 +2,7 @@ import create from "zustand"
 
 const useStore = create((set) => ({
   favoriteList: JSON.parse(localStorage.getItem("favoriteList") || "[]"),
-  ratedMovies: JSON.parse(localStorage.getItem("ratedMovies") || "[]"),
+  ratedMovies: JSON.parse(localStorage.getItem("ratedMovies") || "{}"),
 
   searchValue: "",
   sidebarVisible: false,
@@ -14,24 +14,16 @@ const useStore = create((set) => ({
   setModalDetails: (details) => set({ modalDetails: details }),
   setSidebarVisible: (value) => set({ sidebarVisible: value }),
 
+  addUserRating: (rating) => {
+    set((ratedMovies) => ({
+      ratedMovies: rating,
+    }))
+  },
+
   addToFavorites: (movie) => {
     set((state) => ({
       favoriteList: [movie, ...state.favoriteList],
     }))
-  },
-
-  setUserRating: (rating) => {
-    set((state) => {
-      if (state.ratedMovies.find((movie) => movie.imdbID === rating.imdbID)) {
-        let index = state.ratedMovies.findIndex(
-          (movie) => movie.imdbID === rating.imdbID
-        )
-        index.userRating = rating.userRating
-        return [index, ...state.ratedMovies]
-      } else {
-        return [rating, ...state.ratedMovies]
-      }
-    })
   },
 
   removeFromFavorites: (imdbID) =>
