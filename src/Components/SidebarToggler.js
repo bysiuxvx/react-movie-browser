@@ -1,6 +1,8 @@
 import React from "react"
-import { Button } from "semantic-ui-react"
+
 import useStore from "../Store/store"
+
+import { Button } from "semantic-ui-react"
 
 const SidebarToggler = () => {
   const sidebarVidisble = useStore((state) => state.sidebarVisible)

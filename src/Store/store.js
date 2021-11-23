@@ -17,11 +17,6 @@ const useStore = create((set) => ({
   addUserRating: (rating) => {
     set({ ratedMovies: rating })
   },
-  // addUserRating: (rating) => {
-  //   set((ratedMovies) => ({
-  //     ratedMovies: rating,
-  //   }))
-  // },
 
   addToFavorites: (movie) => {
     set((state) => ({

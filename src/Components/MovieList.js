@@ -1,5 +1,7 @@
 import React from "react"
+
 import useStore from "../Store/store"
+
 import Movie from "./Movie"
 
 const MovieList = () => {

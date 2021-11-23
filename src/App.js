@@ -1,7 +1,8 @@
 import axios from "axios"
 import React, { useCallback, useEffect } from "react"
-import useStore from "./Store/store"
 import debounce from "lodash.debounce"
+
+import useStore from "./Store/store"
 
 import MovieList from "./Components/MovieList"
 import Search from "./Components/Search"

@@ -1,6 +1,8 @@
-import axios from "axios"
 import React from "react"
+import axios from "axios"
+
 import useStore from "../Store/store"
+
 import { Card, Image, Container } from "semantic-ui-react"
 
 const Movie = (props) => {

@@ -1,7 +1,10 @@
 import React, { useEffect } from "react"
-import { Sidebar, Menu } from "semantic-ui-react"
+
 import useStore from "../Store/store"
+
 import FavoriteElement from "./FavoriteElement"
+
+import { Sidebar, Menu } from "semantic-ui-react"
 
 const FavoritesSidebar = () => {
   const sidebarVisible = useStore((state) => state.sidebarVisible)
