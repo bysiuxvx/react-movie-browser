@@ -26,14 +26,15 @@ const App = () => {
     axios
       .get(key)
       .then((response) => {
-        setMovieList(response.data.Search)
+        let filteredMovies = response.data.Search.filter(
+          (list) => list.Type !== "game"
+        )
+        setMovieList(filteredMovies)
       })
       .catch((error) => console.log(error))
   }
 
-  const delayedRequest = useCallback(debounce(movieRequest, 1550), [
-    searchValue,
-  ])
+  const delayedRequest = useCallback(debounce(movieRequest, 500), [searchValue])
 
   useEffect(() => {
     delayedRequest()

@@ -47,7 +47,8 @@ const MovieModal = () => {
             <Image size="big" src={modalDetails.Poster} wrapped />
             <Modal.Description>
               <Header>
-                {modalDetails.Title} {modalDetails.Year}
+                {modalDetails.Title} {modalDetails.Year}{" "}
+                <div class="ui horizontal label">{modalDetails.Type}</div>
               </Header>
               <p>
                 <strong>Genre:</strong> {modalDetails.Genre}
@@ -55,12 +56,13 @@ const MovieModal = () => {
               <p>
                 <strong>Director:</strong> {modalDetails.Director}
               </p>
+              <p>
+                <strong>Runtime:</strong> {modalDetails.Runtime}
+              </p>
               <p>{modalDetails.Plot}</p>
               {modalDetails.Ratings ? (
-                // {modalDetails.Ratings.length > 0 ||
-                // modalDetails.Ratings !== [] ? (
                 <strong>
-                  <p style={{ marginBottom: 10 }}>Rating:</p>
+                  <p style={{ marginBottom: 10 }}>Ratings:</p>
                 </strong>
               ) : null}
               {modalDetails.Ratings
