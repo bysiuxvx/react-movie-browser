@@ -3,9 +3,7 @@ import axios from "axios"
 import { Menu } from "semantic-ui-react"
 import useStore from "../Store/store"
 
-const FavoriteElement = (props) => {
-  const { movie } = props
-
+const FavoriteElement = ({ movie }) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
 
   const getMovieDetails = () => {

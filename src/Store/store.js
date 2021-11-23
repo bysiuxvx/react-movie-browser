@@ -15,10 +15,13 @@ const useStore = create((set) => ({
   setSidebarVisible: (value) => set({ sidebarVisible: value }),
 
   addUserRating: (rating) => {
-    set((ratedMovies) => ({
-      ratedMovies: rating,
-    }))
+    set({ ratedMovies: rating })
   },
+  // addUserRating: (rating) => {
+  //   set((ratedMovies) => ({
+  //     ratedMovies: rating,
+  //   }))
+  // },
 
   addToFavorites: (movie) => {
     set((state) => ({

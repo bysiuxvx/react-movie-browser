@@ -56,13 +56,14 @@ const MovieModal = () => {
                 <strong>Director:</strong> {modalDetails.Director}
               </p>
               <p>{modalDetails.Plot}</p>
-              {modalDetails.Ratings.length > 0 ||
-              modalDetails.Ratings !== [] ? (
+              {modalDetails.Ratings ? (
+                // {modalDetails.Ratings.length > 0 ||
+                // modalDetails.Ratings !== [] ? (
                 <strong>
                   <p style={{ marginBottom: 10 }}>Rating:</p>
                 </strong>
               ) : null}
-              {modalDetails.Ratings.length > 0 || modalDetails.Ratings !== []
+              {modalDetails.Ratings
                 ? modalDetails.Ratings.map((rating) => (
                     <p>
                       <strong>{rating.Source}:</strong> {rating.Value}

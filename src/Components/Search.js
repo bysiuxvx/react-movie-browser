@@ -1,8 +1,9 @@
 import React from "react"
 import useStore from "../Store/store"
+
 import { Input, Container, Icon } from "semantic-ui-react"
 
-const Search = (props) => {
+const Search = () => {
   const searchValue = useStore((state) => state.searchValue)
   const setSearchValue = useStore((state) => state.setSearchValue)
 

@@ -1,13 +1,17 @@
 import axios from "axios"
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import useStore from "./Store/store"
+import debounce from "lodash.debounce"
+
 import MovieList from "./Components/MovieList"
 import Search from "./Components/Search"
 import MovieModal from "./Components/Modal"
-import { Segment } from "semantic-ui-react"
 import FavoritesSidebar from "./Components/FavoritesSidebar"
 import SidebarToggler from "./Components/SidebarToggler"
 import PageDim from "./Components/Dimmer"
+
+import { Segment } from "semantic-ui-react"
+
 import "./Style/style.scss"
 
 const App = () => {
@@ -27,11 +31,16 @@ const App = () => {
       .catch((error) => console.log(error))
   }
 
+  const delayedRequest = useCallback(debounce(movieRequest, 1550), [
+    searchValue,
+  ])
+
   useEffect(() => {
-    movieRequest(searchValue)
+    delayedRequest()
     if (searchValue === "") {
-      setMovieList([])
+      setMovieList(null)
     }
+    return delayedRequest.cancel
   }, [searchValue])
 
   useEffect(() => {
