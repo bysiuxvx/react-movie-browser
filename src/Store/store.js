@@ -1,9 +1,15 @@
 import create from "zustand"
 
-const useStore = create((set) => ({
-  favoriteList: JSON.parse(localStorage.getItem("favoriteList") || "[]"),
-  ratedMovies: JSON.parse(localStorage.getItem("ratedMovies") || "{}"),
+const storageFavorites = JSON.parse(
+  localStorage.getItem("favoriteList") || "[]"
+)
+const storageRatesMovies = JSON.parse(
+  localStorage.getItem("ratedMovies") || "{}"
+)
 
+const useStore = create((set) => ({
+  favoriteList: storageFavorites,
+  ratedMovies: storageRatesMovies,
   searchValue: "",
   sidebarVisible: false,
   movieList: [],
