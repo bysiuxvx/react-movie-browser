@@ -56,12 +56,20 @@ const App = () => {
   return (
     <div className="App">
       <FavoritesSidebar />
-      <Segment basic>
+      <Segment basic className="app-container">
         <Search />
-        {movieList ? <MovieList /> : null}
-        <MovieModal />
-        {favoriteList.length ? <SidebarToggler /> : null}
       </Segment>
+      {movieList ? (
+        <Segment basic className="app-container">
+          <MovieList />
+        </Segment>
+      ) : null}
+      <MovieModal />
+      {favoriteList.length ? (
+        <Segment basic>
+          <SidebarToggler />
+        </Segment>
+      ) : null}
       <PageDim />
     </div>
   )
