@@ -97,6 +97,7 @@ const MovieModal = () => {
                   <br />
                   <br />
                   <Rating
+                    className="star-rating"
                     icon="star"
                     rating={movieRating ? movieRating : 0}
                     maxRating={10}
