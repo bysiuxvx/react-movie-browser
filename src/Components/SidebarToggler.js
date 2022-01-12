@@ -11,7 +11,6 @@ const SidebarToggler = () => {
   if (sidebarVidisble) {
     return (
       <Button
-        inverted
         color="grey"
         className="sidebar-toggle"
         onClick={() => setSidebarVisible(false)}
@@ -21,14 +20,23 @@ const SidebarToggler = () => {
     )
   } else
     return (
-      <Button
-        inverted
-        color="grey"
-        className="sidebar-toggle"
-        onClick={() => setSidebarVisible(true)}
-      >
-        Show favorites
-      </Button>
+      <>
+        <Button
+          color="grey"
+          className="sidebar-toggle"
+          onClick={() => setSidebarVisible(true)}
+        >
+          Show favorites
+        </Button>
+        <Button
+          icon
+          color="grey"
+          className="sidebar-toggle-sm"
+          onClick={() => setSidebarVisible(true)}
+        >
+          <i class="star icon yellow"></i>
+        </Button>
+      </>
     )
 }
 

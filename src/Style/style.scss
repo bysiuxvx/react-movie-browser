@@ -5,23 +5,14 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  p,
-  div,
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-family: "Open Sans", sans-serif !important;
-  }
 }
 
 $main-bg: #302f2f;
 
 $breakpoints: (
-  phone: 320px,
-  iphone: 380px,
+  phone: 400px,
   tablet: 768px,
-  desktop: 1024px,
+  desktop: 1280px,
   desktop-lg: 2560px,
 );
 
@@ -37,11 +28,24 @@ $breakpoints: (
   background-color: $main-bg;
   position: relative;
 
-  .sidebar-toggle {
+  button.button.ui.sidebar-toggle {
     position: fixed;
     left: 50px;
     top: 50px;
-    background-color: $main-bg !important;
+    @include media("<tablet") {
+      display: none;
+    }
+  }
+  button.button.ui.sidebar-toggle-sm {
+    position: fixed;
+    left: 30px;
+    top: 65px;
+    @include media("<phone") {
+      left: 10px;
+    }
+    @include media(">=tablet") {
+      display: none;
+    }
   }
 }
 
@@ -65,30 +69,40 @@ $breakpoints: (
 
 .list-container {
   height: fit-content;
-  width: 80vw;
   display: flex;
-
   flex-wrap: wrap;
   justify-content: center;
   align-content: center;
   overflow: auto;
 
-  @include media("<=tablet") {
-    // flex-direction: column;
-    // background-color: red;
-  }
-  @include media("<=iphone") {
+  @include media("<tablet") {
     flex-direction: row;
-    // background-color: pink;
-    flex-wrap: wrap;
   }
-  @include media(">=tablet", "<=desktop") {
-    width: 80vw;
-    // background-color: white;
+  @include media(">=tablet", "<desktop") {
+    width: 100vw;
+  }
+  @include media(">=desktop", "<=1600px") {
+    background-color: red;
+    max-width: 85vw;
+  }
+  @include media(">1600px", "<=1949px") {
+    // background-color: red;
+    max-width: 80vw;
+  }
+  @include media(">1949px", "<=2079px") {
+    max-width: 75vw;
+  }
+  @include media(">2079px", "<=2228px") {
+    // background-color: red;
+    max-width: 70vw;
+  }
+  @include media(">2228px", "<=3000px") {
+    background-color: yellow;
+    max-width: 65vw;
   }
   @include media(">=desktop-lg") {
+    background-color: blue;
     width: 60vw;
-    // background-color: blue;
   }
 
   .ui.card:first-child,
@@ -128,22 +142,41 @@ $breakpoints: (
 }
 
 .modal {
-  .description p {
-    line-height: 28px;
+  @include media("<=phone") {
+    height: 80vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    overflow-y: auto;
   }
-  div.aligned {
-    &:last-child {
-      display: flex !important;
+
+  div.ui.big.image {
+    @include media("<=phone") {
+      max-width: 230px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    @include media(">phone", "<=tablet") {
+      display: flex;
       align-items: center;
       justify-content: center;
     }
   }
-  .header {
-    //sprawedzic!!!!!!!!!!!!!!!!
-    @include media("<tablet") {
-      font-size: 16px;
+
+  .description p {
+    line-height: 28px;
+  }
+
+  div.center.aligned.column {
+    &:last-of-type {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
+
   .star-rating {
     @include media("<tablet") {
       display: none;
