@@ -7,6 +7,7 @@ import { Menu } from "semantic-ui-react"
 
 const FavoriteElement = ({ movie }) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
+  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
 
   const getMovieDetails = () => {
     const key = `https://www.omdbapi.com/?i=${movie.imdbID}&apikey=b46dc190`
@@ -14,6 +15,8 @@ const FavoriteElement = ({ movie }) => {
       .get(key)
       .then((response) => {
         setModalDetails(response.data)
+        if (window.innerWidth < 1440) setSidebarVisible(false)
+        else return
       })
       .catch((error) => console.log(error))
   }
