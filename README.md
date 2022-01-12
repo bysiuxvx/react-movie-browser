@@ -2,7 +2,7 @@
 
 ## Description
 
-The browser is running the OMDb API. It is possible to save selected movies to your favorites and also to rate movies.
+The browser is running the [OMDb API](http://www.omdbapi.com/). It is possible to save selected movies to your favorites and also to rate movies.
 Both favorites and rated movies are saved in the local storage, so that when you return to the application, the favorites list and your ratings are still preserved.
 
 ## Demo
@@ -15,6 +15,6 @@ Both favorites and rated movies are saved in the local storage, so that when you
     React
     Zustand - state management
     Axios
-    Lodash
+    Lodash debounce
     Semantic UI
-    SCSS
+    SCSS + include media mixin
