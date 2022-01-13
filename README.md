@@ -12,9 +12,9 @@ Both favorites and rated movies are saved in the local storage, so that when you
 
 ## Technologies:
 
-    React
-    Zustand - state management
-    Axios
-    Lodash debounce
-    Semantic UI
-    SCSS + include media mixin
+React
+Zustand - state management
+Axios
+Lodash debounce
+Semantic UI
+SCSS + include media mixin
