@@ -24,15 +24,17 @@ const MovieModal = () => {
 
   const ratedMovies = useStore((state) => state.ratedMovies)
   const addUserRating = useStore((state) => state.addUserRating)
-  const changeUserMovieRating = (event) => {
+  const changeUserMovieRating = (event: React.FormEvent<HTMLInputElement>) => {
+    // const changeUserMovieRating = (event) => {
     const newRating = {
-      imdbID: modalDetails.imdbID,
-      userRating: event.target.value,
+      imdbID: modalDetails?.imdbID,
+      userRating: Number(event.currentTarget.value),
+      // userRating: event.target.value,
       ratedBefore: true,
     }
     let currentRatings = ratedMovies
     let newState = Object.assign({}, currentRatings)
-    newState[newRating.imdbID] = newRating.userRating
+    if (newRating.imdbID) newState[newRating.imdbID] = newRating.userRating
     addUserRating(newState)
   }
 
@@ -50,7 +52,7 @@ const MovieModal = () => {
             <Modal.Description>
               <Header>
                 {modalDetails.Title} {modalDetails.Year}{" "}
-                <div class="ui horizontal label">{modalDetails.Type}</div>
+                <div className="ui horizontal label">{modalDetails.Type}</div>
               </Header>
               <p>
                 <strong>Genre:</strong> {modalDetails.Genre}

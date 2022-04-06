@@ -34,7 +34,7 @@ const SidebarToggler = () => {
           className="sidebar-toggle-sm"
           onClick={() => setSidebarVisible(true)}
         >
-          <i class="star icon yellow"></i>
+          <i className="star icon yellow"></i>
         </Button>
       </>
     )

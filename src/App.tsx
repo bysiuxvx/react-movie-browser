@@ -14,6 +14,8 @@ import PageDim from "./Components/Dimmer"
 import { Segment } from "semantic-ui-react"
 
 import "./Style/style.scss"
+import { SearchItemTypes } from "./enums/SearchItemTypes"
+import { MovieDetails } from "./types/MovieDetails"
 
 const App = () => {
   const searchValue = useStore((state) => state.searchValue)
@@ -27,8 +29,8 @@ const App = () => {
     axios
       .get(key)
       .then((response) => {
-        let filteredMovies = response.data.Search.filter(
-          (list) => list.Type !== "game"
+        const filteredMovies: MovieDetails[] = response.data.Search.filter(
+          ({ Type }: MovieDetails) => Type !== SearchItemTypes.Game
         )
         setMovieList(filteredMovies)
       })
@@ -40,7 +42,7 @@ const App = () => {
   useEffect(() => {
     delayedRequest()
     if (searchValue === "") {
-      setMovieList(null)
+      setMovieList([])
     }
     return delayedRequest.cancel
   }, [searchValue])

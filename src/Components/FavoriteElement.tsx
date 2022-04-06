@@ -3,9 +3,15 @@ import axios from "axios"
 
 import useStore from "../Store/store"
 
+import { MovieDetails } from ".././types/MovieDetails"
+
 import { Menu } from "semantic-ui-react"
 
-const FavoriteElement = ({ movie }) => {
+interface MovieProps {
+  movie: MovieDetails
+}
+
+const FavoriteElement = ({ movie }: MovieProps) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
   const setSidebarVisible = useStore((state) => state.setSidebarVisible)
 
@@ -22,7 +28,7 @@ const FavoriteElement = ({ movie }) => {
   }
 
   return (
-    <Menu.Item onClick={() => getMovieDetails(movie.imdbID)}>
+    <Menu.Item onClick={() => getMovieDetails()}>
       {movie.Title} - {movie.Year}
     </Menu.Item>
   )

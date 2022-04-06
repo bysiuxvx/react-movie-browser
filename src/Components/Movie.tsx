@@ -3,10 +3,15 @@ import axios from "axios"
 
 import useStore from "../Store/store"
 
+import { MovieDetails } from ".././types/MovieDetails"
+
 import { Card, Image, Container } from "semantic-ui-react"
 
-const Movie = (props) => {
-  const { movie } = props
+interface MovieProps {
+  movie: MovieDetails
+}
+
+const Movie = ({ movie }: MovieProps) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
 
   const getMovieDetails = () => {
@@ -20,10 +25,7 @@ const Movie = (props) => {
   }
 
   return (
-    <Card
-      className="movie-element"
-      onClick={() => getMovieDetails(movie.imdbID)}
-    >
+    <Card className="movie-element" onClick={() => getMovieDetails()}>
       <Container className="movie-element-img-container">
         <Image
           src={movie.Poster}
