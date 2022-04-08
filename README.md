@@ -6,6 +6,9 @@ The app is running the [OMDb API](http://www.omdbapi.com/). It is possible to sa
 Both favorites and rated titles are saved in the local storage, so that when you return to the application, the favorites list and your ratings are still preserved.
 The app was initially written in ReactJS, but I have since migrated it to typescript.
 
+State is managed by the amazing [Zustand](https://zustand-demo.pmnd.rs/) library.
+The UI library of my choice was [Semantic UI](https://react.semantic-ui.com/).
+
 ## Demo
 
 - [Gh-pages](https://bysiuxvx.github.io/react-movie-browser/)
