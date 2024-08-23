@@ -1,6 +1,8 @@
+"use client"
+
 import React from "react"
 
-import useStore from "../Store/store"
+import useStore from "../../store/store"
 
 import { Button } from "semantic-ui-react"
 

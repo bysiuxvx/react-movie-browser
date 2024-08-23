@@ -1,6 +1,7 @@
-import React from "react"
+"use client"
 
-import useStore from "../Store/store"
+import React from "react"
+import useStore from "../../store/store"
 
 import { Input, Container, Icon } from "semantic-ui-react"
 

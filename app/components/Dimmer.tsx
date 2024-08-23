@@ -1,10 +1,11 @@
+"use client"
+
 import React from "react"
 
-import useStore from "../Store/store"
-
+import useStore from "../../store/store"
 import { Dimmer } from "semantic-ui-react"
 
-const PageDim = () => {
+const PageDimmer = () => {
   const sidebarVidisble = useStore((state) => state.sidebarVisible)
   const setSidebarVisible = useStore((state) => state.setSidebarVisible)
 
@@ -16,4 +17,4 @@ const PageDim = () => {
     />
   )
 }
-export default PageDim
+export default PageDimmer

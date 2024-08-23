@@ -1,17 +1,18 @@
+"use client"
+
 import React from "react"
 import axios from "axios"
 
-import useStore from "../Store/store"
+import useStore from "../../store/store"
 
-import { MovieDetails } from ".././types/MovieDetails"
+import { MovieDetails } from "../../types/MovieDetails"
 
 import { Menu } from "semantic-ui-react"
 
-interface MovieProps {
-  movie: MovieDetails
-}
+// const FavoriteElement = (movie: MovieDetails) => {
 
-const FavoriteElement = ({ movie }: MovieProps) => {
+// handle movie through db
+const FavoriteElement = (movie: any) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
   const setSidebarVisible = useStore((state) => state.setSidebarVisible)
 
