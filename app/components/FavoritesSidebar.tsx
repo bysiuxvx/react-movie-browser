@@ -1,6 +1,8 @@
+"use client"
+
 import React, { useEffect } from "react"
 
-import useStore from "../Store/store"
+import useStore from "../../store/store"
 
 import FavoriteElement from "./FavoriteElement"
 

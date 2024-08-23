@@ -1,17 +1,20 @@
+"use client"
+
 import React from "react"
 import axios from "axios"
 
-import useStore from "../Store/store"
+import useStore from "../../store/store"
 
-import { MovieDetails } from ".././types/MovieDetails"
+// import { MovieDetails } from ".././types/MovieDetails"
 
 import { Card, Image, Container } from "semantic-ui-react"
 
-interface MovieProps {
-  movie: MovieDetails
-}
+// interface MovieProps {
+//   movie: MovieDetails
+// }
 
-const Movie = ({ movie }: MovieProps) => {
+const Movie = ({ movie }) => {
+  // const Movie = ({ movie }: MovieProps) => {
   const setModalDetails = useStore((state) => state.setModalDetails)
 
   const getMovieDetails = () => {

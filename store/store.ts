@@ -18,12 +18,28 @@ export interface MovieBrowserStoreState {
   removeFromFavorites: (imdbID: string) => void
 }
 
-const storageFavorites = JSON.parse(
-  localStorage.getItem("favoriteList") || "[]"
-)
-const storageRatesMovies = JSON.parse(
-  localStorage.getItem("ratedMovies") || "{}"
-)
+// const storageFavorites = JSON.parse(
+//   localStorage.getItem("favoriteList") || "[]"
+// )
+// const storageRatesMovies = JSON.parse(
+//   localStorage.getItem("ratedMovies") || "{}"
+// )
+
+let storageFavorites
+try {
+  storageFavorites = JSON.parse(localStorage.getItem("favoriteList") || "[]")
+} catch (error) {
+  console.error("Error parsing favoriteList:", error)
+  storageFavorites = []
+}
+
+let storageRatesMovies
+try {
+  storageRatesMovies = JSON.parse(localStorage.getItem("ratedMovies") || "{}")
+} catch (error) {
+  console.error("Error parsing ratedMovies:", error)
+  storageRatesMovies = {}
+}
 
 const useStore = create<MovieBrowserStoreState>((set) => ({
   favoriteList: storageFavorites,

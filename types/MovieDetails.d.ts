@@ -1,4 +1,4 @@
-import { SearchItemTypes } from "../enums/SearchItemTypes"
+import { SearchItemTypes } from "../../enums/SearchItemTypes"
 
 export interface MovieDetails {
   Title: string
