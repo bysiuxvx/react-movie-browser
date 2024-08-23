@@ -27,7 +27,7 @@ model Favorite {
   createdAt DateTime @default(now())
 
   rating    Rating?  @relation(fields: [ratingId], references: [id])
-  ratingId  String?  @unique  // Ensure ratingId is unique
+  ratingId  String?  @unique
 }
 
 model Rating {
