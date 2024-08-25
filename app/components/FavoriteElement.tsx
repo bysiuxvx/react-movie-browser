@@ -3,34 +3,43 @@
 import React from "react"
 import axios from "axios"
 
-import useStore from "../../store/store"
-
-import { MovieDetails } from "../../types/MovieDetails"
+import { modalDetailsAtom, sidebarVisibleAtom } from "../../store/store"
 
 import { Menu } from "semantic-ui-react"
+import { useAtom } from "jotai"
+import { Favorite } from "@prisma/client"
 
-// const FavoriteElement = (movie: MovieDetails) => {
+const FavoriteElement = (media: Favorite) => {
+  const [, setModalDetails] = useAtom(modalDetailsAtom)
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
-// handle movie through db
-const FavoriteElement = (movie: any) => {
-  const setModalDetails = useStore((state) => state.setModalDetails)
-  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
+  const MIN_WINDOW_WIDTH: number = 1440
 
-  const getMovieDetails = () => {
-    const key = `https://www.omdbapi.com/?i=${movie.imdbID}&apikey=b46dc190`
-    axios
-      .get(key)
-      .then((response) => {
-        setModalDetails(response.data)
-        if (window.innerWidth < 1440) setSidebarVisible(false)
-        else return
-      })
-      .catch((error) => console.log(error))
+  const URL: string = `/api/search/id?movieId=${media.itemId}`
+
+  const getMediaDetails = async () => {
+    try {
+      const { data } = await axios.get(URL)
+      setModalDetails(data)
+      if (window.innerWidth < MIN_WINDOW_WIDTH) setSidebarVisible(false)
+    } catch (error: any) {
+      console.error("Error fetching media details:", error)
+
+      if (error.response) {
+        console.log(
+          `Error: ${
+            error.response.data.error || "Failed to fetch movie details"
+          }`
+        )
+      } else {
+        console.log("An unexpected error occurred. Please try again later.")
+      }
+    }
   }
 
   return (
-    <Menu.Item onClick={() => getMovieDetails()}>
-      {movie.Title} - {movie.Year}
+    <Menu.Item onClick={() => getMediaDetails()}>
+      {media?.itemName} - {media?.itemYear}
     </Menu.Item>
   )
 }

@@ -2,20 +2,21 @@
 
 import React, { useEffect } from "react"
 
-import useStore from "../../store/store"
-
 import FavoriteElement from "./FavoriteElement"
 
 import { Sidebar, Menu } from "semantic-ui-react"
-
+import { sidebarVisibleAtom } from "../../store/store"
+import { useAtom } from "jotai"
+import { Favorite } from "@prisma/client"
+import { useFavorites } from "../utils/favorites-actions"
 const FavoritesSidebar = () => {
-  const sidebarVisible = useStore((state) => state.sidebarVisible)
-  const favoriteList = useStore((state) => state.favoriteList)
-  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
+  const [sidebarVisible, setSidebarVisible] = useAtom(sidebarVisibleAtom)
+
+  const { favorites, isLoading, isError } = useFavorites()
 
   useEffect(() => {
-    if (favoriteList.length === 0) setSidebarVisible(false)
-  }, [favoriteList])
+    if (!favorites) setSidebarVisible(false)
+  }, [favorites])
 
   return (
     <>
@@ -26,10 +27,12 @@ const FavoritesSidebar = () => {
         vertical
         visible={sidebarVisible}
       >
-        <h3>Your favorite movies!</h3>
-        {favoriteList.length > 0
-          ? favoriteList.map((movie) => (
-              <FavoriteElement key={movie.imdbID} movie={movie} />
+        <h3>Your favorite and series!</h3>
+        {isLoading && <p>Loading...</p>}
+        {isError && <p>Error loading favorites.</p>}
+        {favorites && favorites.length > 0
+          ? favorites.map((media: Favorite) => (
+              <FavoriteElement key={media.itemId} {...media} />
             ))
           : null}
       </Sidebar>

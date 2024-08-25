@@ -1,8 +1,7 @@
 "use client"
 
-import React from "react"
-
-import useStore from "../../store/store"
+import { useAtom } from "jotai"
+import React, { useEffect, useState } from "react"
 
 import {
   Button,
@@ -15,40 +14,85 @@ import {
   Label,
   Rating,
 } from "semantic-ui-react"
+import { modalDetailsAtom } from "../../store/store"
+import { MediaDetails } from "../../models/MediaDetails"
+import {
+  addToFavorites,
+  removeFavorite,
+  useFavorites,
+} from "../utils/favorites-actions"
+import toast from "react-hot-toast"
 
-const MovieModal = () => {
-  const modalDetails = useStore((state) => state.modalDetails)
-  const clearModalDetails = useStore((state) => state.setModalDetails)
+const MediaModal = () => {
+  const [buttonDisabled, setbuttonDisabled] = useState({
+    add: false,
+    remove: false,
+  })
+  const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
+    modalDetailsAtom
+  )
 
-  const favoriteList = useStore((state) => state.favoriteList)
-  const addToFavorites = useStore((state) => state.addToFavorites)
-  const removeFromFavorites = useStore((state) => state.removeFromFavorites)
+  const { favorites, isLoading, isError } = useFavorites()
 
-  const ratedMovies = useStore((state) => state.ratedMovies)
-  const addUserRating = useStore((state) => state.addUserRating)
-  const changeUserMovieRating = (event: React.FormEvent<HTMLInputElement>) => {
-    // const changeUserMovieRating = (event) => {
-    const newRating = {
-      imdbID: modalDetails?.imdbID,
-      userRating: Number(event.currentTarget.value),
-      // userRating: event.target.value,
-      ratedBefore: true,
+  const handleAddToFavorites = async (modalDetails: MediaDetails) => {
+    setbuttonDisabled((prevState) => ({
+      add: true,
+      remove: false,
+    }))
+    try {
+      toast.promise(addToFavorites(modalDetails), {
+        loading: "⏱️ Adding...",
+        success: <b>👏 Successfully added to favorites!</b>,
+        error: <b>Could not add...</b>,
+      })
+    } catch (error) {
+      setbuttonDisabled((prevState) => ({
+        add: false,
+        remove: false,
+      }))
+      console.error("Error adding to favorites:", error)
     }
-    let currentRatings = ratedMovies
-    let newState = Object.assign({}, currentRatings)
-    if (newRating.imdbID) newState[newRating.imdbID] = newRating.userRating
-    addUserRating(newState)
   }
 
-  const movieRating = modalDetails ? ratedMovies[modalDetails.imdbID] : null
+  const handleRemoveFavorite = async (itemId: string) => {
+    setbuttonDisabled((prevState) => ({
+      add: false,
+      remove: true,
+    }))
+    try {
+      toast.promise(removeFavorite(itemId), {
+        loading: "⏱️ Removing...",
+        success: <b>🗑️ Successfully removed from favorites!</b>,
+        error: <b>Could not remove...</b>,
+      })
+    } catch (error) {
+      setbuttonDisabled((prevState) => ({
+        add: false,
+        remove: false,
+      }))
+      console.error("Error removing from favorites:", error)
+    }
+  }
+
+  useEffect(() => {
+    setbuttonDisabled((prevState) => ({
+      add: false,
+      remove: false,
+    }))
+  }, [modalDetails])
+
+  const isFavorite = favorites?.find(
+    (item) => item.itemId === modalDetails?.imdbID
+  )
+
+  const mediaRating = modalDetails
+    ? favorites.find((item) => item?.itemId === modalDetails.imdbID)?.ratingId
+    : null
 
   return (
     <>
       {modalDetails && (
-        <Modal
-          onClose={() => clearModalDetails(null)}
-          open={modalDetails ? true : false}
-        >
+        <Modal onClose={() => setModalDetails(undefined)} open={!!modalDetails}>
           <Modal.Content image>
             <Image size="big" src={modalDetails.Poster} wrapped />
             <Modal.Description>
@@ -58,7 +102,7 @@ const MovieModal = () => {
               </Header>
               <p>
                 <strong>Genre:</strong> {modalDetails.Genre}
-              </p>{" "}
+              </p>
               <p>
                 <strong>Director:</strong> {modalDetails.Director}
               </p>
@@ -84,43 +128,43 @@ const MovieModal = () => {
             <Segment>
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
-                  <Label>How would you rate this movie?</Label>
+                  <Label>How would you rate this {modalDetails.Type}?</Label>
                   <p style={{ margin: "7px 0" }}>
                     Your rating:{" "}
-                    {movieRating
-                      ? movieRating
+                    {mediaRating
+                      ? mediaRating
                       : "You haven't rated it yet. Did you like it?"}
                   </p>
                   <input
                     type="range"
                     min={0}
                     max={10}
-                    value={movieRating ? movieRating : 0}
-                    onChange={changeUserMovieRating}
+                    value={mediaRating ? mediaRating : 0}
+                    // onChange={changeUserMovieRating}
                   />
                   <br />
                   <br />
                   <Rating
                     className="star-rating"
                     icon="star"
-                    rating={movieRating ? movieRating : 0}
+                    rating={mediaRating ? mediaRating : 0}
                     maxRating={10}
                   />
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
-                  {favoriteList.find(
-                    (item) => item.imdbID === modalDetails.imdbID
-                  ) ? (
+                  {isFavorite ? (
                     <Button
-                      onClick={() => removeFromFavorites(modalDetails.imdbID)}
+                      onClick={() => handleRemoveFavorite(modalDetails.imdbID)}
                       color="red"
+                      disabled={buttonDisabled.remove}
                     >
                       Remove from favorites
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => addToFavorites(modalDetails)}
+                      onClick={() => handleAddToFavorites(modalDetails)}
                       color="blue"
+                      disabled={buttonDisabled.add}
                     >
                       Add to favorites
                     </Button>
@@ -136,4 +180,4 @@ const MovieModal = () => {
   )
 }
 
-export default MovieModal
+export default MediaModal
