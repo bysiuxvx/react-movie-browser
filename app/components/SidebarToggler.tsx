@@ -1,45 +1,33 @@
 "use client"
 
+import { useAtom } from "jotai"
 import React from "react"
 
-import useStore from "../../store/store"
-
 import { Button } from "semantic-ui-react"
+import { sidebarVisibleAtom } from "../../store/store"
 
 const SidebarToggler = () => {
-  const sidebarVidisble = useStore((state) => state.sidebarVisible)
-  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
-  if (sidebarVidisble) {
-    return (
+  return (
+    <>
       <Button
         color="grey"
         className="sidebar-toggle"
-        onClick={() => setSidebarVisible(false)}
+        onClick={() => setSidebarVisible(true)}
       >
-        Hide favorites
+        Show favorites
       </Button>
-    )
-  } else
-    return (
-      <>
-        <Button
-          color="grey"
-          className="sidebar-toggle"
-          onClick={() => setSidebarVisible(true)}
-        >
-          Show favorites
-        </Button>
-        <Button
-          icon
-          color="grey"
-          className="sidebar-toggle-sm"
-          onClick={() => setSidebarVisible(true)}
-        >
-          <i className="star icon yellow"></i>
-        </Button>
-      </>
-    )
+      <Button
+        icon
+        color="grey"
+        className="sidebar-toggle-sm"
+        onClick={() => setSidebarVisible(true)}
+      >
+        <i className="star icon yellow"></i>
+      </Button>
+    </>
+  )
 }
 
 export default SidebarToggler

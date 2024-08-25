@@ -1,65 +1,26 @@
 "use client"
 
-import axios from "axios"
-import React, { useCallback, useEffect } from "react"
-import debounce from "lodash.debounce"
+import React from "react"
 import { Segment } from "semantic-ui-react"
 
 import FavoritesSidebar from "./components/FavoritesSidebar"
 import Search from "./components/Search"
-import MovieList from "./components/MovieList"
-import MovieModal from "./components/Modal"
+
+import MediaList from "./components/MediaList"
+import MediaModal from "./components/Modal"
 import SidebarToggler from "./components/SidebarToggler"
 import PageDimmer from "./components/Dimmer"
 
-import useStore from "../store/store"
-import { SearchItemTypes } from "../enums/SearchItemTypes"
+import { mediaListAtom } from "../store/store"
+
+import { useAtom } from "jotai"
+import { MediaDetails } from "../models/MediaDetails"
+import { useFavorites } from "./utils/favorites-actions"
 
 const HomePage = () => {
-  const searchValue = useStore((state) => state.searchValue)
-  const movieList = useStore((state) => state.movieList)
-  const setMovieList = useStore((state) => state.setMovieList)
-  const favoriteList = useStore((state) => state.favoriteList)
-  const ratedMovies = useStore((state) => state.ratedMovies)
+  const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
 
-  const URL: string = `https://www.omdbapi.com/?s=${searchValue}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
-  const DEBOUNCE_TIME: number = 500
-
-  const fetchMovies = useCallback(
-    debounce(
-      () =>
-        searchValue
-          ? axios
-              .get(URL)
-              .then(({ data }) => {
-                const filteredMovies = data.Search.filter(
-                  ({ Type }) => Type !== SearchItemTypes.GAME
-                )
-                setMovieList(filteredMovies)
-              })
-              .catch((error) => console.error(error))
-          : null,
-      DEBOUNCE_TIME
-    ),
-    [searchValue, setMovieList]
-  )
-
-  useEffect(() => {
-    if (searchValue) {
-      fetchMovies()
-    } else {
-      setMovieList([])
-    }
-    return fetchMovies.cancel
-  }, [searchValue, fetchMovies])
-
-  // useEffect(() => {
-  //   localStorage.setItem("favoriteList", JSON.stringify(favoriteList))
-  // }, [favoriteList])
-
-  // useEffect(() => {
-  //   localStorage.setItem("ratedMovies", JSON.stringify(ratedMovies))
-  // }, [ratedMovies])
+  const { favorites, isLoading, isError } = useFavorites()
 
   return (
     <div className="App">
@@ -67,13 +28,13 @@ const HomePage = () => {
       <Segment basic className="app-container">
         <Search />
       </Segment>
-      {movieList ? (
+      {mediaList ? (
         <Segment basic className="app-container">
-          <MovieList />
+          <MediaList />
         </Segment>
       ) : null}
-      <MovieModal />
-      {favoriteList ? (
+      <MediaModal />
+      {favorites?.length ? (
         <Segment basic>
           <SidebarToggler />
         </Segment>
