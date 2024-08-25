@@ -32,6 +32,9 @@ importers:
       include-media:
         specifier: ^1.4.10
         version: 1.4.10
+      jotai:
+        specifier: ^2.9.3
+        version: 2.9.3(@types/react@17.0.80)(react@18.3.1)
       lodash.debounce:
         specifier: ^4.0.8
         version: 4.0.8
@@ -59,9 +62,6 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
-      zustand:
-        specifier: ^4.5.5
-        version: 4.5.5(@types/react@17.0.80)(react@18.3.1)
     devDependencies:
       '@types/lodash.debounce':
         specifier: ^4.0.6
@@ -365,6 +365,18 @@ packages:
     resolution: {integrity: sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==}
     engines: {node: '>=0.12.0'}
 
+  jotai@2.9.3:
+    resolution: {integrity: sha512-IqMWKoXuEzWSShjd9UhalNsRGbdju5G2FrqNLQJT+Ih6p41VNYe2sav5hnwQx4HJr25jq9wRqvGSWGviGG6Gjw==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
+
   jquery@3.7.1:
     resolution: {integrity: sha512-m4avr8yL8kmFN8psrbFFFmB/If14iN5o9nw/NgnnM+kybDJpRsAynV2BsfpTYrTRysYUdADVD7CkUUizgkpLfg==}
 
@@ -582,21 +594,6 @@ packages:
 
   warning@4.0.3:
     resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}
-
-  zustand@4.5.5:
-    resolution: {integrity: sha512-+0PALYNJNgK6hldkgDq2vLrw5f6g/jCInz52n9RTpropGgeAf/ioFUCdtsjCqu4gNhW9D01rUQBROoRjdzyn2Q==}
-    engines: {node: '>=12.7.0'}
-    peerDependencies:
-      '@types/react': '>=16.8'
-      immer: '>=9.0.6'
-      react: '>=16.8'
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-      immer:
-        optional: true
-      react:
-        optional: true
 
 snapshots:
 
@@ -874,6 +871,11 @@ snapshots:
 
   is-number@7.0.0: {}
 
+  jotai@2.9.3(@types/react@17.0.80)(react@18.3.1):
+    optionalDependencies:
+      '@types/react': 17.0.80
+      react: 18.3.1
+
   jquery@3.7.1: {}
 
   js-cookie@3.0.5: {}
@@ -1078,10 +1080,3 @@ snapshots:
   warning@4.0.3:
     dependencies:
       loose-envify: 1.4.0
-
-  zustand@4.5.5(@types/react@17.0.80)(react@18.3.1):
-    dependencies:
-      use-sync-external-store: 1.2.2(react@18.3.1)
-    optionalDependencies:
-      '@types/react': 17.0.80
-      react: 18.3.1
