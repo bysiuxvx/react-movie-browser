@@ -3,7 +3,7 @@
 import { useAtom } from "jotai"
 import React from "react"
 
-import { Button } from "semantic-ui-react"
+import { Button, Icon } from "semantic-ui-react"
 import { sidebarVisibleAtom } from "../../store/store"
 
 const SidebarToggler = () => {
@@ -16,7 +16,7 @@ const SidebarToggler = () => {
         className="sidebar-toggle"
         onClick={() => setSidebarVisible(true)}
       >
-        Show favorites
+        <Icon size="large" name="bars"></Icon>
       </Button>
       <Button
         icon
