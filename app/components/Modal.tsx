@@ -15,6 +15,7 @@ import {
   Segment,
   Label,
   Rating,
+  Icon,
 } from "semantic-ui-react"
 import { modalDetailsAtom } from "../../store/store"
 import { MediaDetails } from "../../models/MediaDetails"
@@ -24,7 +25,11 @@ import {
   useFavorites,
 } from "../utils/favorites-actions"
 
-import { createRating, useRatings } from "../utils/ratings-actions"
+import {
+  createRating,
+  removeRating,
+  useRatings,
+} from "../utils/ratings-actions"
 import toast from "react-hot-toast"
 
 const MediaModal = () => {
@@ -118,6 +123,21 @@ const MediaModal = () => {
     debouncedHandleRateMedia(rating)
   }
 
+  const handleRemoveRating = async (itemId: string) => {
+    setRatingDisabled(true)
+    try {
+      await toast.promise(removeRating(itemId), {
+        loading: "⏱️ Removing...",
+        success: <b>🗑️ Successfully removed from ratings!</b>,
+        error: <b>Could not remove...</b>,
+      })
+    } catch (error) {
+      console.error("Error removing from ratings:", error)
+    } finally {
+      setRatingDisabled(false)
+    }
+  }
+
   const isFavorite = favorites?.find(
     (item) => item.itemId === modalDetails?.imdbID
   )
@@ -166,11 +186,23 @@ const MediaModal = () => {
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this {modalDetails.Type}?</Label>
-                  <p style={{ margin: "7px 0" }}>
-                    {mediaRating
-                      ? `Your rating: ${mediaRating}`
-                      : "You haven't rated it yet. Did you like it?"}
-                  </p>
+                  <div>
+                    <p style={{ margin: "7px 0" }}>
+                      {mediaRating
+                        ? `Your rating: ${mediaRating}`
+                        : "You haven't rated it yet. Did you like it?"}
+                    </p>
+                    {mediaRating ? (
+                      <Icon
+                        name="remove"
+                        inverted
+                        circular
+                        link
+                        size="small"
+                        onClick={() => handleRemoveRating(modalDetails.imdbID)}
+                      />
+                    ) : null}
+                  </div>
                   <input
                     type="range"
                     min={0}
