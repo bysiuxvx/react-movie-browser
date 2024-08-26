@@ -1,9 +1,23 @@
 "use client"
 
-import { useAtom } from "jotai"
 import React, { useCallback, useEffect, useState } from "react"
 
+import { useAtom } from "jotai"
+import { modalDetailsAtom } from "../../store/store"
+
 import debounce from "lodash.debounce"
+
+import {
+  createRating,
+  removeRating,
+  useRatings,
+} from "../utils/ratings-actions"
+
+import {
+  addToFavorites,
+  removeFavorite,
+  useFavorites,
+} from "../utils/favorites-actions"
 
 import {
   Button,
@@ -17,19 +31,8 @@ import {
   Rating,
   Icon,
 } from "semantic-ui-react"
-import { modalDetailsAtom } from "../../store/store"
 import { MediaDetails } from "../../models/MediaDetails"
-import {
-  addToFavorites,
-  removeFavorite,
-  useFavorites,
-} from "../utils/favorites-actions"
 
-import {
-  createRating,
-  removeRating,
-  useRatings,
-} from "../utils/ratings-actions"
 import toast from "react-hot-toast"
 
 const MediaModal = () => {
@@ -38,6 +41,9 @@ const MediaModal = () => {
     remove: false,
   })
   const [ratingDisabled, setRatingDisabled] = useState(false)
+  const [optimisticRating, setOptimisticRating] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [tempRating, setTempRating] = useState<number | null>(null)
   const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
     modalDetailsAtom
   )
@@ -100,26 +106,39 @@ const MediaModal = () => {
 
   const debouncedHandleRateMedia = useCallback(
     debounce(async (value: number) => {
-      if (!modalDetails) return
-
-      setRatingDisabled(true)
       try {
-        await toast.promise(createRating(modalDetails.imdbID, value), {
+        await toast.promise(createRating(modalDetails!.imdbID, value), {
           loading: "⏱️ Rating...",
-          success: <b>👏 Successfully rated {modalDetails.Title}!</b>,
+          success: <b>👏 Successfully rated!</b>,
           error: <b>Could not rate...</b>,
         })
       } catch (error) {
         console.error("Error adding to ratings:", error)
+        const previousRating =
+          ratings.find((item) => item.itemId === modalDetails!.imdbID)
+            ?.rating || 0
+        setOptimisticRating(previousRating)
       } finally {
         setRatingDisabled(false)
       }
     }, DEBOUNCE_TIME),
-    [modalDetails]
+    [modalDetails, ratings]
   )
 
-  const handleRateMedia = (event: React.FormEvent<HTMLInputElement>) => {
-    const rating = Number(event.currentTarget.value)
+  const handleMouseUp = () => {
+    if (isDragging && tempRating !== null) {
+      handleRateMedia(tempRating)
+      setIsDragging(false)
+    }
+  }
+
+  const handleRateMedia = (rating: number) => {
+    if (rating === 0) {
+      handleRemoveRating(modalDetails!.imdbID)
+      return
+    }
+
+    setOptimisticRating(rating)
     debouncedHandleRateMedia(rating)
   }
 
@@ -188,8 +207,8 @@ const MediaModal = () => {
                   <Label>How would you rate this {modalDetails.Type}?</Label>
                   <div>
                     <p style={{ margin: "7px 0" }}>
-                      {mediaRating
-                        ? `Your rating: ${mediaRating}`
+                      {mediaRating !== null && mediaRating !== undefined
+                        ? `Your rating: ${optimisticRating}`
                         : "You haven't rated it yet. Did you like it?"}
                     </p>
                     {mediaRating ? (
@@ -207,16 +226,20 @@ const MediaModal = () => {
                     type="range"
                     min={0}
                     max={10}
-                    value={mediaRating ? mediaRating : 0}
+                    value={tempRating !== null ? tempRating : mediaRating || 0}
                     disabled={ratingDisabled}
-                    onChange={handleRateMedia}
+                    onMouseDown={() => setIsDragging(true)}
+                    onMouseUp={handleMouseUp}
+                    onChange={(event) =>
+                      setTempRating(Number(event.target.value))
+                    }
                   />
                   <br />
                   <br />
                   <Rating
                     className="star-rating"
                     icon="star"
-                    rating={mediaRating ? mediaRating : 0}
+                    rating={tempRating !== null ? tempRating : mediaRating || 0}
                     disabled={ratingDisabled}
                     maxRating={10}
                   />
