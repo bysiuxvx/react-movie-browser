@@ -34,6 +34,7 @@ import {
 import { MediaDetails } from "../../models/MediaDetails"
 
 import toast from "react-hot-toast"
+import { useUser } from "@clerk/nextjs"
 
 const MediaModal = () => {
   const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
@@ -47,6 +48,8 @@ const MediaModal = () => {
   const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
     modalDetailsAtom
   )
+
+  const { user } = useUser()
 
   const { favorites, isLoading, isError } = useFavorites()
   const {
@@ -163,6 +166,11 @@ const MediaModal = () => {
   }
 
   useEffect(() => {
+    if (!user) {
+      setOptimisticRating(null)
+      setTempRating(null)
+      return
+    }
     if (modalDetails) {
       const existingRating =
         ratings.find((item) => item.itemId === modalDetails.imdbID)?.rating ||
@@ -218,9 +226,11 @@ const MediaModal = () => {
                   <Label>How would you rate this {modalDetails.Type}?</Label>
                   <div className="rating-container">
                     <p>
-                      {mediaRating !== null && mediaRating !== undefined
-                        ? `Your rating: ${optimisticRating}`
-                        : "You haven't rated it yet. Did you like it?"}
+                      {user
+                        ? optimisticRating !== null
+                          ? `Your rating: ${optimisticRating}`
+                          : "You haven't rated it yet. Did you like it?"
+                        : "Please log in to rate and save your favorite movies and series!"}
                     </p>
                     {mediaRating ? (
                       <Icon
@@ -228,6 +238,7 @@ const MediaModal = () => {
                         inverted
                         circular
                         link
+                        disabled={ratingDisabled}
                         size="small"
                         onClick={() => handleRemoveRating(modalDetails.imdbID)}
                       />
@@ -238,7 +249,7 @@ const MediaModal = () => {
                     min={0}
                     max={10}
                     value={tempRating !== null ? tempRating : mediaRating || 0}
-                    disabled={ratingDisabled}
+                    disabled={ratingDisabled || !user}
                     onMouseDown={() => setIsDragging(true)}
                     onMouseUp={handleMouseUp}
                     onChange={(event) =>
@@ -268,7 +279,7 @@ const MediaModal = () => {
                     <Button
                       onClick={() => handleAddToFavorites(modalDetails)}
                       color="blue"
-                      disabled={favoriteButtonDisabled.add}
+                      disabled={favoriteButtonDisabled.add || !user}
                     >
                       Add to favorites
                     </Button>

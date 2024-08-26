@@ -2,13 +2,7 @@ import type { Metadata } from "next"
 import React from "react"
 
 import "semantic-ui-css/semantic.min.css"
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs"
+import { ClerkProvider } from "@clerk/nextjs"
 import { Toaster, ToasterProps } from "react-hot-toast"
 
 import "../style/style.scss"
@@ -41,11 +35,7 @@ export default function RootLayout({
           <div>
             <Toaster {...toasterProps} />
           </div>
-          <header>
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-          </header>
+          <header></header>
           <main>{children}</main>
         </body>
       </html>
