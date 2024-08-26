@@ -66,7 +66,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(result, { status: 200 })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in PUT handler:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
