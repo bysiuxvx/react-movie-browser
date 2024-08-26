@@ -1,7 +1,9 @@
 "use client"
 
 import { useAtom } from "jotai"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
+
+import debounce from "lodash.debounce"
 
 import {
   Button,
@@ -21,21 +23,31 @@ import {
   removeFavorite,
   useFavorites,
 } from "../utils/favorites-actions"
+
+import { createRating, useRatings } from "../utils/ratings-actions"
 import toast from "react-hot-toast"
 
 const MediaModal = () => {
-  const [buttonDisabled, setbuttonDisabled] = useState({
+  const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
     add: false,
     remove: false,
   })
+  const [ratingDisabled, setRatingDisabled] = useState(false)
   const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
     modalDetailsAtom
   )
 
   const { favorites, isLoading, isError } = useFavorites()
+  const {
+    ratings,
+    isLoading: ratingsIsLoading,
+    isError: ratingsIsError,
+  } = useRatings()
+
+  const DEBOUNCE_TIME: number = 350
 
   const handleAddToFavorites = async (modalDetails: MediaDetails) => {
-    setbuttonDisabled((prevState) => ({
+    setFavoritebuttonDisabled((prevState) => ({
       add: true,
       remove: false,
     }))
@@ -46,7 +58,7 @@ const MediaModal = () => {
         error: <b>Could not add...</b>,
       })
     } catch (error) {
-      setbuttonDisabled((prevState) => ({
+      setFavoritebuttonDisabled((prevState) => ({
         add: false,
         remove: false,
       }))
@@ -55,7 +67,7 @@ const MediaModal = () => {
   }
 
   const handleRemoveFavorite = async (itemId: string) => {
-    setbuttonDisabled((prevState) => ({
+    setFavoritebuttonDisabled((prevState) => ({
       add: false,
       remove: true,
     }))
@@ -66,7 +78,7 @@ const MediaModal = () => {
         error: <b>Could not remove...</b>,
       })
     } catch (error) {
-      setbuttonDisabled((prevState) => ({
+      setFavoritebuttonDisabled((prevState) => ({
         add: false,
         remove: false,
       }))
@@ -75,18 +87,43 @@ const MediaModal = () => {
   }
 
   useEffect(() => {
-    setbuttonDisabled((prevState) => ({
+    setFavoritebuttonDisabled((prevState) => ({
       add: false,
       remove: false,
     }))
   }, [modalDetails])
+
+  const debouncedHandleRateMedia = useCallback(
+    debounce(async (value: number) => {
+      if (!modalDetails) return
+
+      setRatingDisabled(true)
+      try {
+        await toast.promise(createRating(modalDetails.imdbID, value), {
+          loading: "⏱️ Rating...",
+          success: <b>👏 Successfully rated {modalDetails.Title}!</b>,
+          error: <b>Could not rate...</b>,
+        })
+      } catch (error) {
+        console.error("Error adding to ratings:", error)
+      } finally {
+        setRatingDisabled(false)
+      }
+    }, DEBOUNCE_TIME),
+    [modalDetails]
+  )
+
+  const handleRateMedia = (event: React.FormEvent<HTMLInputElement>) => {
+    const rating = Number(event.currentTarget.value)
+    debouncedHandleRateMedia(rating)
+  }
 
   const isFavorite = favorites?.find(
     (item) => item.itemId === modalDetails?.imdbID
   )
 
   const mediaRating = modalDetails
-    ? favorites.find((item) => item?.itemId === modalDetails.imdbID)?.ratingId
+    ? ratings.find((item) => item?.itemId === modalDetails.imdbID)?.rating
     : null
 
   return (
@@ -130,9 +167,8 @@ const MediaModal = () => {
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this {modalDetails.Type}?</Label>
                   <p style={{ margin: "7px 0" }}>
-                    Your rating:{" "}
                     {mediaRating
-                      ? mediaRating
+                      ? `Your rating: ${mediaRating}`
                       : "You haven't rated it yet. Did you like it?"}
                   </p>
                   <input
@@ -140,7 +176,8 @@ const MediaModal = () => {
                     min={0}
                     max={10}
                     value={mediaRating ? mediaRating : 0}
-                    // onChange={changeUserMovieRating}
+                    disabled={ratingDisabled}
+                    onChange={handleRateMedia}
                   />
                   <br />
                   <br />
@@ -148,6 +185,7 @@ const MediaModal = () => {
                     className="star-rating"
                     icon="star"
                     rating={mediaRating ? mediaRating : 0}
+                    disabled={ratingDisabled}
                     maxRating={10}
                   />
                 </Grid.Column>
@@ -156,7 +194,7 @@ const MediaModal = () => {
                     <Button
                       onClick={() => handleRemoveFavorite(modalDetails.imdbID)}
                       color="red"
-                      disabled={buttonDisabled.remove}
+                      disabled={favoriteButtonDisabled.remove}
                     >
                       Remove from favorites
                     </Button>
@@ -164,7 +202,7 @@ const MediaModal = () => {
                     <Button
                       onClick={() => handleAddToFavorites(modalDetails)}
                       color="blue"
-                      disabled={buttonDisabled.add}
+                      disabled={favoriteButtonDisabled.add}
                     >
                       Add to favorites
                     </Button>
