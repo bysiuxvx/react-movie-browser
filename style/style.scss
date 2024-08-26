@@ -142,6 +142,19 @@ $breakpoints: (
   }
 }
 
+.rating-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  p {
+    margin: 0 10px 0 0;
+  }
+  .ui.icon {
+    margin-left: auto;
+  }
+}
+
 .ui.modal {
   z-index: 1200;
   @include media("<=phone") {
