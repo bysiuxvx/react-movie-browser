@@ -136,7 +136,7 @@ const MediaModal = () => {
     }
   }
 
-  const handleRateMedia = (rating) => {
+  const handleRateMedia = (rating: number) => {
     if (rating === 0) {
       handleRemoveRating(modalDetails!.imdbID)
       return
