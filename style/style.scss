@@ -111,7 +111,7 @@ $breakpoints: (
     margin: 20px;
   }
 
-  .movie-element {
+  .media-element {
     height: 370px;
     width: 220px;
     margin: 20px;
@@ -123,11 +123,11 @@ $breakpoints: (
       transform: translate(0, -10px);
     }
 
-    .movie-element-img-container {
+    .media-element-img-container {
       padding: 10px;
       width: 170px;
 
-      .movie-element-img {
+      .media-element-img {
         object-fit: cover;
         @include media("<tablet") {
           max-width: 85%;
@@ -191,7 +191,7 @@ $breakpoints: (
 }
 
 .ui.overlay.sidebar {
-  z-index: 1001;
+  z-index: 5000 !important;
 }
 .sidebar {
   position: relative;
