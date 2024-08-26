@@ -4,9 +4,6 @@ import React from "react"
 
 import { useAtom } from "jotai"
 import { mediaListAtom } from "../store/store"
-import { useFavorites } from "./utils/favorites-actions"
-
-import FavoritesSidebar from "./components/FavoritesSidebar"
 
 import { Segment } from "semantic-ui-react"
 import MediaList from "./components/MediaList"
@@ -16,15 +13,15 @@ import PageDimmer from "./components/Dimmer"
 import { MediaDetails } from "../models/MediaDetails"
 import Search from "./Components/Search"
 import MediaModal from "./Components/Modal"
+import UserSidebar from "./components/UserSidebar"
+import { SignedIn } from "@clerk/nextjs"
 
 const HomePage = () => {
   const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
 
-  const { favorites, isLoading, isError } = useFavorites()
-
   return (
     <>
-      <FavoritesSidebar />
+      <UserSidebar />
       <Segment basic className="app-container">
         <Search />
       </Segment>
@@ -34,11 +31,11 @@ const HomePage = () => {
         </Segment>
       ) : null}
       <MediaModal />
-      {favorites?.length ? (
+      <SignedIn>
         <Segment basic>
           <SidebarToggler />
         </Segment>
-      ) : null}
+      </SignedIn>
       <PageDimmer />
     </>
   )
