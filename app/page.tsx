@@ -1,21 +1,21 @@
 "use client"
 
 import React from "react"
-import { Segment } from "semantic-ui-react"
+
+import { useAtom } from "jotai"
+import { mediaListAtom } from "../store/store"
+import { useFavorites } from "./utils/favorites-actions"
 
 import FavoritesSidebar from "./components/FavoritesSidebar"
-import Search from "./components/Search"
 
+import { Segment } from "semantic-ui-react"
 import MediaList from "./components/MediaList"
-import MediaModal from "./components/Modal"
 import SidebarToggler from "./components/SidebarToggler"
 import PageDimmer from "./components/Dimmer"
 
-import { mediaListAtom } from "../store/store"
-
-import { useAtom } from "jotai"
 import { MediaDetails } from "../models/MediaDetails"
-import { useFavorites } from "./utils/favorites-actions"
+import Search from "./Components/Search"
+import MediaModal from "./Components/Modal"
 
 const HomePage = () => {
   const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
@@ -23,7 +23,7 @@ const HomePage = () => {
   const { favorites, isLoading, isError } = useFavorites()
 
   return (
-    <div className="App">
+    <>
       <FavoritesSidebar />
       <Segment basic className="app-container">
         <Search />
@@ -40,7 +40,7 @@ const HomePage = () => {
         </Segment>
       ) : null}
       <PageDimmer />
-    </div>
+    </>
   )
 }
 

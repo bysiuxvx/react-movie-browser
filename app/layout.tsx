@@ -37,7 +37,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body>
+        <body className="App">
           <div>
             <Toaster {...toasterProps} />
           </div>
