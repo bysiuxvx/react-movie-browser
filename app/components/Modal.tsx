@@ -30,6 +30,7 @@ import {
   Label,
   Rating,
   Icon,
+  List,
 } from "semantic-ui-react"
 import { MediaDetails } from "../../models/MediaDetails"
 
@@ -180,9 +181,10 @@ const MediaModal = () => {
     }
   }, [modalDetails, ratings])
 
-  const mediaRating = modalDetails
-    ? ratings.find((item) => item?.itemId === modalDetails.imdbID)?.rating
-    : null
+  const userRatingForCurrentMedia =
+    user && modalDetails
+      ? ratings.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
+      : null
 
   return (
     <>
@@ -206,33 +208,39 @@ const MediaModal = () => {
               </p>
               <p>{modalDetails.Plot}</p>
               {modalDetails.Ratings ? (
-                <strong>
-                  <p style={{ marginBottom: 10 }}>Ratings:</p>
-                </strong>
+                <List divided relaxed>
+                  {modalDetails.Ratings?.map((rating, i) => (
+                    <List.Item key={i}>
+                      <List.Content>
+                        <List.Header>{rating.Source}</List.Header>
+                        <List.Description>{rating.Value}</List.Description>
+                      </List.Content>
+                    </List.Item>
+                  ))}
+                </List>
               ) : null}
-              {modalDetails.Ratings
-                ? modalDetails.Ratings.map((rating) => (
-                    <p>
-                      <strong>{rating.Source}:</strong> {rating.Value}
-                    </p>
-                  ))
-                : null}
             </Modal.Description>
           </Modal.Content>
           <Modal.Actions>
+            {!user && (
+              <Segment basic textAlign="center">
+                <h4>
+                  Please log in to rate and save your favorite movies and
+                  series!
+                </h4>
+              </Segment>
+            )}
             <Segment>
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this {modalDetails.Type}?</Label>
                   <div className="rating-container">
                     <p>
-                      {user
-                        ? optimisticRating !== null
-                          ? `Your rating: ${optimisticRating}`
-                          : "You haven't rated it yet. Did you like it?"
-                        : "Please log in to rate and save your favorite movies and series!"}
+                      {user && optimisticRating !== null
+                        ? `Your rating: ${optimisticRating}`
+                        : "You haven't rated it yet. Did you like it?"}
                     </p>
-                    {mediaRating ? (
+                    {userRatingForCurrentMedia ? (
                       <Icon
                         name="remove"
                         inverted
@@ -248,7 +256,11 @@ const MediaModal = () => {
                     type="range"
                     min={0}
                     max={10}
-                    value={tempRating !== null ? tempRating : mediaRating || 0}
+                    value={
+                      tempRating !== null
+                        ? tempRating
+                        : userRatingForCurrentMedia || 0
+                    }
                     disabled={ratingDisabled || !user}
                     onMouseDown={() => setIsDragging(true)}
                     onMouseUp={handleMouseUp}
@@ -261,13 +273,17 @@ const MediaModal = () => {
                   <Rating
                     className="star-rating"
                     icon="star"
-                    rating={tempRating !== null ? tempRating : mediaRating || 0}
+                    rating={
+                      tempRating !== null
+                        ? tempRating
+                        : userRatingForCurrentMedia || 0
+                    }
                     disabled={ratingDisabled}
                     maxRating={10}
                   />
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
-                  {isFavorite ? (
+                  {user && isFavorite ? (
                     <Button
                       onClick={() => handleRemoveFavorite(modalDetails.imdbID)}
                       color="red"
