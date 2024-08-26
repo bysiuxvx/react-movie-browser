@@ -9,7 +9,8 @@ import { sidebarVisibleAtom } from "../../store/store"
 import { useAtom } from "jotai"
 import { Favorite } from "@prisma/client"
 import { useFavorites } from "../utils/favorites-actions"
-const FavoritesSidebar = () => {
+import { UserButton } from "@clerk/nextjs"
+const UserSidebar = () => {
   const [sidebarVisible, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
   const { favorites, isLoading, isError } = useFavorites()
@@ -27,6 +28,7 @@ const FavoritesSidebar = () => {
         vertical
         visible={sidebarVisible}
       >
+        <UserButton />
         <h3>Your favorite and series!</h3>
         {isLoading && <p>Loading...</p>}
         {isError && <p>Error loading favorites.</p>}
@@ -40,4 +42,4 @@ const FavoritesSidebar = () => {
   )
 }
 
-export default FavoritesSidebar
+export default UserSidebar
