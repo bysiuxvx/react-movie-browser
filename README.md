@@ -11,6 +11,7 @@ The UI library of my choice was [Semantic UI](https://react.semantic-ui.com/).
 ## Update history
 
 ~~2022 update: The app was initially written in ReactJS, but I have since migrated it to typescript.~~
+<br>
 **2024 update**: yet another migration out of boredom...The app is now built in Nextjs, database and user authentication have been added on top of other improvements. The UI has not changed or improved much, because I was not **THAT** bored...
 
 ## Demo
