@@ -24,11 +24,7 @@ export async function GET(req: NextRequest) {
     const userWithFavorites = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
-        favorites: {
-          include: {
-            rating: true,
-          },
-        },
+        favorites: {},
       },
     })
 

@@ -25,9 +25,6 @@ model Favorite {
   itemName  String
   itemYear  String
   createdAt DateTime @default(now())
-
-  rating    Rating?  @relation(fields: [ratingId], references: [id])
-  ratingId  String?  @unique
 }
 
 model Rating {
@@ -38,5 +35,5 @@ model Rating {
   rating    Int
   createdAt DateTime @default(now())
 
-  favorite  Favorite?
+   @@unique([userId, itemId])
 }
