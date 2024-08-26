@@ -14,7 +14,6 @@ import { MediaDetails } from "../models/MediaDetails"
 import Search from "./Components/Search"
 import MediaModal from "./Components/Modal"
 import UserSidebar from "./components/UserSidebar"
-import { SignedIn } from "@clerk/nextjs"
 
 const HomePage = () => {
   const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
@@ -22,20 +21,18 @@ const HomePage = () => {
   return (
     <>
       <UserSidebar />
-      <Segment basic className="app-container">
+      <Segment basic>
         <Search />
       </Segment>
-      {mediaList ? (
-        <Segment basic className="app-container">
+      {mediaList && (
+        <Segment basic>
           <MediaList />
         </Segment>
-      ) : null}
+      )}
       <MediaModal />
-      <SignedIn>
-        <Segment basic>
-          <SidebarToggler />
-        </Segment>
-      </SignedIn>
+      <Segment basic>
+        <SidebarToggler />
+      </Segment>
       <PageDimmer />
     </>
   )
