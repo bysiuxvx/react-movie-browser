@@ -214,47 +214,6 @@ const MediaModal = () => {
           <Modal.Actions>
             <Segment>
               <Grid columns={2} relaxed="very" centered>
-                {/* <Grid.Column centered textAlign="center">
-                  <Label>How would you rate this {modalDetails.Type}?</Label>
-                  <div>
-                    <p>
-                      {mediaRating !== null && mediaRating !== undefined
-                        ? `Your rating: ${optimisticRating}`
-                        : "You haven't rated it yet. Did you like it?"}
-                    </p>
-                    {mediaRating ? (
-                      <Icon
-                        name="remove"
-                        inverted
-                        circular
-                        link
-                        size="small"
-                        onClick={() => handleRemoveRating(modalDetails.imdbID)}
-                      />
-                    ) : null}
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={10}
-                    value={tempRating !== null ? tempRating : mediaRating || 0}
-                    disabled={ratingDisabled}
-                    onMouseDown={() => setIsDragging(true)}
-                    onMouseUp={handleMouseUp}
-                    onChange={(event) =>
-                      setTempRating(Number(event.target.value))
-                    }
-                  />
-                  <br />
-                  <br />
-                  <Rating
-                    className="star-rating"
-                    icon="star"
-                    rating={tempRating !== null ? tempRating : mediaRating || 0}
-                    disabled={ratingDisabled}
-                    maxRating={10}
-                  />
-                </Grid.Column> */}
                 <Grid.Column centered textAlign="center">
                   <Label>How would you rate this {modalDetails.Type}?</Label>
                   <div className="rating-container">
