@@ -115,11 +115,19 @@ const MediaModal = () => {
   const debouncedHandleRateMedia = useCallback(
     debounce(async (value: number) => {
       try {
-        await toast.promise(createRating(modalDetails!.imdbID, value), {
-          loading: "⏱️ Rating...",
-          success: <b>👏 Successfully rated!</b>,
-          error: <b>Could not rate...</b>,
-        })
+        await toast.promise(
+          createRating(
+            modalDetails!.imdbID,
+            modalDetails!.Title,
+            modalDetails!.Year,
+            value
+          ),
+          {
+            loading: "⏱️ Rating...",
+            success: <b>👏 Successfully rated!</b>,
+            error: <b>Could not rate...</b>,
+          }
+        )
       } catch (error) {
         console.error("Error adding to ratings:", error)
         const previousRating =

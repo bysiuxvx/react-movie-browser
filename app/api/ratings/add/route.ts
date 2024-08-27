@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    const { itemId, rating } = await req.json()
+    const { itemId, rating, title, itemYear } = await req.json()
 
     let user = await prisma.user.findUnique({
       where: {
@@ -61,6 +61,8 @@ export async function PUT(req: NextRequest) {
           userId: user.id,
           itemId,
           rating,
+          title,
+          itemYear,
         },
       })
     }
