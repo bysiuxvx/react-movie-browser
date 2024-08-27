@@ -29,6 +29,7 @@ const Search = () => {
       .catch((error) => console.error(error))
   }, [searchValue])
 
+  // /
   useEffect(() => {
     if (!searchValue) {
       setMediaList([])
