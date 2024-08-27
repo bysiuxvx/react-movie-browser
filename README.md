@@ -16,14 +16,14 @@ The UI library of my choice was [Semantic UI](https://react.semantic-ui.com/).
 
 ## Demo
 
-- [Gh-pages](https://bysiuxvx.github.io/react-movie-browser/)
-- [Heroku](https://react-movie-browser.herokuapp.com/)
+- [Vercel](https://react-movie-browser-1rwsy4njx-bysiuxvxs-projects.vercel.app)
 
 ## Technologies:
 
     Next.js 14
     Clerk
     Supabase
+    Prisma
     Typescript
     Jotai
     Axios
