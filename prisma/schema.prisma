@@ -32,6 +32,8 @@ model Rating {
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   itemId    String
+  title     String
+  itemYear  String
   rating    Int
   createdAt DateTime @default(now())
 
