@@ -4,7 +4,6 @@ import { Favorite } from "@prisma/client"
 
 const FAVORITES_URL = "/api/favorites"
 
-// Function to fetch favorites using Fetch API
 const fetchFavorites = async () => {
   const response = await fetch(FAVORITES_URL)
   if (!response.ok) {
@@ -25,7 +24,6 @@ export const useFavorites = () => {
   }
 }
 
-// Function to add to favorites using Fetch API
 export const addToFavorites = async (media: MediaDetails) => {
   try {
     const response = await fetch(`${FAVORITES_URL}/add`, {
@@ -49,7 +47,6 @@ export const addToFavorites = async (media: MediaDetails) => {
   }
 }
 
-// Function to remove from favorites using Fetch API
 export const removeFavorite = async (itemId: string) => {
   try {
     const response = await fetch(`${FAVORITES_URL}/remove`, {
