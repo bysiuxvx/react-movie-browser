@@ -5,7 +5,10 @@ import React from "react"
 
 import { Button, Icon } from "semantic-ui-react"
 import { sidebarVisibleAtom } from "../../store/store"
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs"
+
+import CustomSignInButton from "./CustomSignIn"
+
+import { SignedIn, SignedOut, SignIn, SignInButton } from "@clerk/nextjs"
 
 const SidebarToggler = () => {
   const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
@@ -20,19 +23,9 @@ const SidebarToggler = () => {
         >
           <Icon size="large" name="bars"></Icon>
         </Button>
-        <Button
-          icon
-          color="grey"
-          className="sidebar-toggle-sm"
-          onClick={() => setSidebarVisible(true)}
-        >
-          <i className="star icon yellow"></i>
-        </Button>
       </SignedIn>
       <SignedOut>
-        <button className="sidebar-toggle">
-          <SignInButton />
-        </button>
+        <CustomSignInButton />
       </SignedOut>
     </>
   )
