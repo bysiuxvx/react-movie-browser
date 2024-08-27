@@ -31,7 +31,8 @@
     "start": "npx serve@latest ./build",
     "db-start": "npx supabase start",
     "db-stop": "npx supabase stop --backup",
-    "prisma-studio": "npx prisma studio"
+    "prisma-studio": "npx prisma studio",
+    "postinstall": "prisma generate"
   },
   "eslintConfig": {
     "extends": [
