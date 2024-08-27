@@ -1,12 +1,15 @@
 import useSWR, { mutate } from "swr"
-import axios from "axios"
-import { MediaDetails } from "../../models/MediaDetails"
-
 import { Rating } from "@prisma/client"
 
 const RATINGS_URL = "/api/ratings"
 
-const fetchRatings = () => axios.get(RATINGS_URL).then((res) => res.data)
+const fetchRatings = async () => {
+  const response = await fetch(RATINGS_URL)
+  if (!response.ok) {
+    throw new Error("Network response was not ok")
+  }
+  return response.json()
+}
 
 export const useRatings = () => {
   const { data, error } = useSWR(RATINGS_URL, fetchRatings) as {
@@ -27,12 +30,21 @@ export const createRating = async (
   rating: number
 ) => {
   try {
-    await axios.put(`${RATINGS_URL}/add`, {
-      itemId,
-      rating,
-      title,
-      itemYear,
+    const response = await fetch(`${RATINGS_URL}/add`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId,
+        rating,
+        title,
+        itemYear,
+      }),
     })
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
     mutate(RATINGS_URL)
   } catch (error) {
     console.error("Failed to rate the media:", error)
@@ -42,9 +54,16 @@ export const createRating = async (
 
 export const removeRating = async (itemId: string) => {
   try {
-    await axios.delete(`${RATINGS_URL}/remove`, {
-      data: { itemId },
+    const response = await fetch(`${RATINGS_URL}/remove`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ itemId }),
     })
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
     mutate(RATINGS_URL)
   } catch (error) {
     console.error("Failed to remove the rating:", error)
