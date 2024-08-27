@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       )
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching media details:", error)
 
     if (error.response) {
