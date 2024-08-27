@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(req: NextRequest) {
@@ -17,22 +17,31 @@ export async function GET(req: NextRequest) {
         { status: 404 }
       )
     }
-  } catch (error: any) {
+  } catch (error) {
     console.error("Error fetching media details:", error)
 
-    if (error.response) {
-      return NextResponse.json(
-        { error: error.response.data },
-        { status: error.response.status }
-      )
-    } else if (error.request) {
-      return NextResponse.json(
-        { error: "No response received from the API" },
-        { status: 500 }
-      )
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError
+
+      if (axiosError.response) {
+        return NextResponse.json(
+          { error: axiosError.response.data },
+          { status: axiosError.response.status }
+        )
+      } else if (axiosError.request) {
+        return NextResponse.json(
+          { error: "No response received from the API" },
+          { status: 500 }
+        )
+      } else {
+        return NextResponse.json(
+          { error: "An unknown error occurred" },
+          { status: 500 }
+        )
+      }
     } else {
       return NextResponse.json(
-        { error: "An unknown error occurred" },
+        { error: "An unexpected error occurred" },
         { status: 500 }
       )
     }
