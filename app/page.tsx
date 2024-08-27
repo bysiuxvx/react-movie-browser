@@ -10,16 +10,17 @@ import {
   userRatingsAtom,
 } from "../store/store"
 
-import { Segment } from "semantic-ui-react"
+import { MediaDetails } from "../models/MediaDetails"
+import { useUser } from "@clerk/nextjs"
+
+import UserSidebar from "./components/UserSidebar"
 import MediaList from "./components/MediaList"
 import SidebarToggler from "./components/SidebarToggler"
 import PageDimmer from "./components/Dimmer"
+import Search from "./components/Search"
+import MediaModal from "./components/Modal"
 
-import { MediaDetails } from "../models/MediaDetails"
-import Search from "./Components/Search"
-import MediaModal from "./Components/Modal"
-import UserSidebar from "./components/UserSidebar"
-import { useUser } from "@clerk/nextjs"
+import { Segment } from "semantic-ui-react"
 
 const HomePage = () => {
   const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
