@@ -131,6 +131,7 @@ $breakpoints: (
 
       .media-element-img {
         object-fit: cover;
+        aspect-ratio: auto;
         @include media("<tablet") {
           max-width: 85%;
         }
