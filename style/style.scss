@@ -144,6 +144,15 @@ $breakpoints: (
   }
 }
 
+.user-button {
+  margin-top: 15px;
+}
+
+.accordion-container {
+  max-height: 50vh !important;
+  overflow: auto !important;
+}
+
 .rating-container {
   display: flex;
   align-items: center;
