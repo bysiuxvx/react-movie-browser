@@ -27,7 +27,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx generate && next build",
     "start": "npx serve@latest ./build",
     "db-start": "npx supabase start",
     "db-stop": "npx supabase stop --backup",
