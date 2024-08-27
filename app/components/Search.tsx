@@ -7,7 +7,6 @@ import { Input, Container, Icon } from "semantic-ui-react"
 import { mediaListAtom } from "../../store/store"
 import { MediaDetails } from "../../models/MediaDetails"
 import debounce from "lodash.debounce"
-import axios from "axios"
 import { SearchItemTypes } from "../../enums/SearchItemTypes"
 
 const Search = () => {
@@ -18,18 +17,22 @@ const Search = () => {
   const DEBOUNCE_TIME: number = 500
 
   const fetchMediaData = useCallback(() => {
-    axios
-      .get(API_URL)
-      .then(({ data }) => {
+    fetch(API_URL)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok")
+        }
+        return response.json()
+      })
+      .then((data) => {
         const filteredMedia: MediaDetails[] = data.Search.filter(
           (media: MediaDetails) => media.Type !== SearchItemTypes.GAME
         )
         setMediaList(filteredMedia)
       })
-      .catch((error) => console.error(error))
+      .catch((error) => console.error("Fetch error:", error))
   }, [searchValue])
 
-  // /
   useEffect(() => {
     if (!searchValue) {
       setMediaList([])
