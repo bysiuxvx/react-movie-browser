@@ -55,14 +55,16 @@ $breakpoints: (
 }
 
 .search-container {
-  padding: 0 225px;
   .search-input {
     border-radius: 30px;
     input {
+      width: 300px;
       transition: 0.5s;
       background-color: $component-bg;
       border-radius: 30px;
-      padding-left: 70px;
+      &::placeholder {
+        color: #000;
+      }
     }
   }
 }
@@ -111,7 +113,7 @@ $breakpoints: (
     margin: 20px;
   }
 
-  .movie-element {
+  .media-element {
     height: 370px;
     width: 220px;
     margin: 20px;
@@ -123,11 +125,11 @@ $breakpoints: (
       transform: translate(0, -10px);
     }
 
-    .movie-element-img-container {
+    .media-element-img-container {
       padding: 10px;
       width: 170px;
 
-      .movie-element-img {
+      .media-element-img {
         object-fit: cover;
         @include media("<tablet") {
           max-width: 85%;
@@ -139,6 +141,28 @@ $breakpoints: (
       padding-top: 15px;
       max-height: 115px;
     }
+  }
+}
+
+.user-button {
+  margin-top: 15px;
+}
+
+.accordion-container {
+  max-height: 50vh !important;
+  overflow: auto !important;
+}
+
+.rating-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  p {
+    margin: 0 10px 0 0;
+  }
+  .ui.icon {
+    margin-left: auto;
   }
 }
 
@@ -191,7 +215,7 @@ $breakpoints: (
 }
 
 .ui.overlay.sidebar {
-  z-index: 1001;
+  z-index: 5000 !important;
 }
 .sidebar {
   position: relative;

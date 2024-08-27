@@ -1,85 +1,59 @@
 "use client"
 
-import axios from "axios"
-import React, { useCallback, useEffect } from "react"
-import debounce from "lodash.debounce"
-import { Segment } from "semantic-ui-react"
+import React, { useEffect } from "react"
 
-import FavoritesSidebar from "./components/FavoritesSidebar"
-import Search from "./components/Search"
-import MovieList from "./components/MovieList"
-import MovieModal from "./components/Modal"
+import { useAtom } from "jotai"
+import {
+  favoritesAtom,
+  mediaListAtom,
+  sidebarVisibleAtom,
+  userRatingsAtom,
+} from "../store/store"
+
+import { Segment } from "semantic-ui-react"
+import MediaList from "./components/MediaList"
 import SidebarToggler from "./components/SidebarToggler"
 import PageDimmer from "./components/Dimmer"
 
-import useStore from "../store/store"
-import { SearchItemTypes } from "../enums/SearchItemTypes"
+import { MediaDetails } from "../models/MediaDetails"
+import Search from "./Components/Search"
+import MediaModal from "./Components/Modal"
+import UserSidebar from "./components/UserSidebar"
+import { useUser } from "@clerk/nextjs"
 
 const HomePage = () => {
-  const searchValue = useStore((state) => state.searchValue)
-  const movieList = useStore((state) => state.movieList)
-  const setMovieList = useStore((state) => state.setMovieList)
-  const favoriteList = useStore((state) => state.favoriteList)
-  const ratedMovies = useStore((state) => state.ratedMovies)
+  const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
+  const { user } = useUser()
 
-  const URL: string = `https://www.omdbapi.com/?s=${searchValue}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
-  const DEBOUNCE_TIME: number = 500
-
-  const fetchMovies = useCallback(
-    debounce(
-      () =>
-        searchValue
-          ? axios
-              .get(URL)
-              .then(({ data }) => {
-                const filteredMovies = data.Search.filter(
-                  ({ Type }) => Type !== SearchItemTypes.GAME
-                )
-                setMovieList(filteredMovies)
-              })
-              .catch((error) => console.error(error))
-          : null,
-      DEBOUNCE_TIME
-    ),
-    [searchValue, setMovieList]
-  )
+  const [, setFavorites] = useAtom(favoritesAtom)
+  const [, setRatings] = useAtom(userRatingsAtom)
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
   useEffect(() => {
-    if (searchValue) {
-      fetchMovies()
-    } else {
-      setMovieList([])
+    if (!user) {
+      setFavorites([])
+      setRatings([])
+      setSidebarVisible(false)
     }
-    return fetchMovies.cancel
-  }, [searchValue, fetchMovies])
-
-  // useEffect(() => {
-  //   localStorage.setItem("favoriteList", JSON.stringify(favoriteList))
-  // }, [favoriteList])
-
-  // useEffect(() => {
-  //   localStorage.setItem("ratedMovies", JSON.stringify(ratedMovies))
-  // }, [ratedMovies])
+  }, [user, setFavorites, setRatings, setSidebarVisible])
 
   return (
-    <div className="App">
-      <FavoritesSidebar />
-      <Segment basic className="app-container">
+    <>
+      <UserSidebar />
+      <Segment basic>
         <Search />
       </Segment>
-      {movieList ? (
-        <Segment basic className="app-container">
-          <MovieList />
-        </Segment>
-      ) : null}
-      <MovieModal />
-      {favoriteList ? (
+      {mediaList && (
         <Segment basic>
-          <SidebarToggler />
+          <MediaList />
         </Segment>
-      ) : null}
+      )}
+      <MediaModal />
+      <Segment basic>
+        <SidebarToggler />
+      </Segment>
       <PageDimmer />
-    </div>
+    </>
   )
 }
 

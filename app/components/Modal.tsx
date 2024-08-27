@@ -1,8 +1,23 @@
 "use client"
 
-import React from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
-import useStore from "../../store/store"
+import { useAtom } from "jotai"
+import { modalDetailsAtom } from "../../store/store"
+
+import debounce from "lodash.debounce"
+
+import {
+  createRating,
+  removeRating,
+  useRatings,
+} from "../utils/ratings-actions"
+
+import {
+  addToFavorites,
+  removeFavorite,
+  useFavorites,
+} from "../utils/favorites-actions"
 
 import {
   Button,
@@ -14,41 +29,175 @@ import {
   Segment,
   Label,
   Rating,
+  Icon,
+  List,
 } from "semantic-ui-react"
+import { MediaDetails } from "../../models/MediaDetails"
 
-const MovieModal = () => {
-  const modalDetails = useStore((state) => state.modalDetails)
-  const clearModalDetails = useStore((state) => state.setModalDetails)
+import toast from "react-hot-toast"
+import { useUser } from "@clerk/nextjs"
 
-  const favoriteList = useStore((state) => state.favoriteList)
-  const addToFavorites = useStore((state) => state.addToFavorites)
-  const removeFromFavorites = useStore((state) => state.removeFromFavorites)
+const MediaModal = () => {
+  const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
+    add: false,
+    remove: false,
+  })
+  const [ratingDisabled, setRatingDisabled] = useState(false)
+  const [optimisticRating, setOptimisticRating] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const [tempRating, setTempRating] = useState<number | null>(null)
+  const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
+    modalDetailsAtom
+  )
 
-  const ratedMovies = useStore((state) => state.ratedMovies)
-  const addUserRating = useStore((state) => state.addUserRating)
-  const changeUserMovieRating = (event: React.FormEvent<HTMLInputElement>) => {
-    // const changeUserMovieRating = (event) => {
-    const newRating = {
-      imdbID: modalDetails?.imdbID,
-      userRating: Number(event.currentTarget.value),
-      // userRating: event.target.value,
-      ratedBefore: true,
+  const { user } = useUser()
+
+  const { favorites, isLoading, isError } = useFavorites()
+  const {
+    ratings,
+    isLoading: ratingsIsLoading,
+    isError: ratingsIsError,
+  } = useRatings()
+
+  const DEBOUNCE_TIME: number = 350
+
+  const handleAddToFavorites = async (modalDetails: MediaDetails) => {
+    setFavoritebuttonDisabled((prevState) => ({
+      add: true,
+      remove: false,
+    }))
+    try {
+      toast.promise(addToFavorites(modalDetails), {
+        loading: "⏱️ Adding...",
+        success: <b>👏 Successfully added to favorites!</b>,
+        error: <b>Could not add...</b>,
+      })
+    } catch (error) {
+      setFavoritebuttonDisabled((prevState) => ({
+        add: false,
+        remove: false,
+      }))
+      console.error("Error adding to favorites:", error)
     }
-    let currentRatings = ratedMovies
-    let newState = Object.assign({}, currentRatings)
-    if (newRating.imdbID) newState[newRating.imdbID] = newRating.userRating
-    addUserRating(newState)
   }
 
-  const movieRating = modalDetails ? ratedMovies[modalDetails.imdbID] : null
+  const handleRemoveFavorite = async (itemId: string) => {
+    setFavoritebuttonDisabled((prevState) => ({
+      add: false,
+      remove: true,
+    }))
+    try {
+      toast.promise(removeFavorite(itemId), {
+        loading: "⏱️ Removing...",
+        success: <b>🗑️ Successfully removed from favorites!</b>,
+        error: <b>Could not remove...</b>,
+      })
+    } catch (error) {
+      setFavoritebuttonDisabled((prevState) => ({
+        add: false,
+        remove: false,
+      }))
+      console.error("Error removing from favorites:", error)
+    }
+  }
+
+  const isFavorite = favorites?.find(
+    (item) => item.itemId === modalDetails?.imdbID
+  )
+
+  useEffect(() => {
+    setFavoritebuttonDisabled((prevState) => ({
+      add: false,
+      remove: false,
+    }))
+  }, [modalDetails])
+
+  const debouncedHandleRateMedia = useCallback(
+    debounce(async (value: number) => {
+      try {
+        await toast.promise(
+          createRating(
+            modalDetails!.imdbID,
+            modalDetails!.Title,
+            modalDetails!.Year,
+            value
+          ),
+          {
+            loading: "⏱️ Rating...",
+            success: <b>👏 Successfully rated!</b>,
+            error: <b>Could not rate...</b>,
+          }
+        )
+      } catch (error) {
+        console.error("Error adding to ratings:", error)
+        const previousRating =
+          ratings.find((item) => item.itemId === modalDetails!.imdbID)
+            ?.rating || 0
+        setOptimisticRating(previousRating)
+      } finally {
+        setRatingDisabled(false)
+      }
+    }, DEBOUNCE_TIME),
+    [modalDetails, ratings]
+  )
+
+  const handleMouseUp = () => {
+    if (isDragging && tempRating !== null) {
+      handleRateMedia(tempRating)
+      setIsDragging(false)
+    }
+  }
+
+  const handleRateMedia = (rating: number) => {
+    if (rating === 0) {
+      handleRemoveRating(modalDetails!.imdbID)
+      return
+    }
+
+    setOptimisticRating(rating)
+    setTempRating(rating)
+    debouncedHandleRateMedia(rating)
+  }
+
+  const handleRemoveRating = async (itemId: string) => {
+    setRatingDisabled(true)
+    try {
+      await toast.promise(removeRating(itemId), {
+        loading: "⏱️ Removing...",
+        success: <b>🗑️ Successfully removed from ratings!</b>,
+        error: <b>Could not remove...</b>,
+      })
+    } catch (error) {
+      console.error("Error removing from ratings:", error)
+    } finally {
+      setRatingDisabled(false)
+    }
+  }
+
+  useEffect(() => {
+    if (!user) {
+      setOptimisticRating(null)
+      setTempRating(null)
+      return
+    }
+    if (modalDetails) {
+      const existingRating =
+        ratings.find((item) => item.itemId === modalDetails.imdbID)?.rating ||
+        null
+      setOptimisticRating(existingRating)
+      setTempRating(existingRating)
+    }
+  }, [modalDetails, ratings])
+
+  const userRatingForCurrentMedia =
+    user && modalDetails
+      ? ratings.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
+      : null
 
   return (
     <>
       {modalDetails && (
-        <Modal
-          onClose={() => clearModalDetails(null)}
-          open={modalDetails ? true : false}
-        >
+        <Modal onClose={() => setModalDetails(undefined)} open={!!modalDetails}>
           <Modal.Content image>
             <Image size="big" src={modalDetails.Poster} wrapped />
             <Modal.Description>
@@ -58,7 +207,7 @@ const MovieModal = () => {
               </Header>
               <p>
                 <strong>Genre:</strong> {modalDetails.Genre}
-              </p>{" "}
+              </p>
               <p>
                 <strong>Director:</strong> {modalDetails.Director}
               </p>
@@ -67,60 +216,94 @@ const MovieModal = () => {
               </p>
               <p>{modalDetails.Plot}</p>
               {modalDetails.Ratings ? (
-                <strong>
-                  <p style={{ marginBottom: 10 }}>Ratings:</p>
-                </strong>
+                <List divided relaxed>
+                  {modalDetails.Ratings?.map((rating, i) => (
+                    <List.Item key={i}>
+                      <List.Content>
+                        <List.Header>{rating.Source}</List.Header>
+                        <List.Description>{rating.Value}</List.Description>
+                      </List.Content>
+                    </List.Item>
+                  ))}
+                </List>
               ) : null}
-              {modalDetails.Ratings
-                ? modalDetails.Ratings.map((rating) => (
-                    <p>
-                      <strong>{rating.Source}:</strong> {rating.Value}
-                    </p>
-                  ))
-                : null}
             </Modal.Description>
           </Modal.Content>
           <Modal.Actions>
+            {!user && (
+              <Segment basic textAlign="center">
+                <h4>
+                  Please log in to rate and save your favorite movies and
+                  series!
+                </h4>
+              </Segment>
+            )}
             <Segment>
               <Grid columns={2} relaxed="very" centered>
                 <Grid.Column centered textAlign="center">
-                  <Label>How would you rate this movie?</Label>
-                  <p style={{ margin: "7px 0" }}>
-                    Your rating:{" "}
-                    {movieRating
-                      ? movieRating
-                      : "You haven't rated it yet. Did you like it?"}
-                  </p>
+                  <Label>How would you rate this {modalDetails.Type}?</Label>
+                  <div className="rating-container">
+                    <p>
+                      {user && optimisticRating !== null
+                        ? `Your rating: ${optimisticRating}`
+                        : "You haven't rated it yet. Did you like it?"}
+                    </p>
+                    {userRatingForCurrentMedia ? (
+                      <Icon
+                        name="remove"
+                        inverted
+                        circular
+                        link
+                        disabled={ratingDisabled}
+                        size="small"
+                        onClick={() => handleRemoveRating(modalDetails.imdbID)}
+                      />
+                    ) : null}
+                  </div>
                   <input
                     type="range"
                     min={0}
                     max={10}
-                    value={movieRating ? movieRating : 0}
-                    onChange={changeUserMovieRating}
+                    value={
+                      tempRating !== null
+                        ? tempRating
+                        : userRatingForCurrentMedia || 0
+                    }
+                    disabled={ratingDisabled || !user}
+                    onMouseDown={() => setIsDragging(true)}
+                    onMouseUp={handleMouseUp}
+                    onChange={(event) =>
+                      setTempRating(Number(event.target.value))
+                    }
                   />
                   <br />
                   <br />
                   <Rating
                     className="star-rating"
                     icon="star"
-                    rating={movieRating ? movieRating : 0}
+                    rating={
+                      tempRating !== null
+                        ? tempRating
+                        : userRatingForCurrentMedia || 0
+                    }
+                    disabled={ratingDisabled}
                     maxRating={10}
                   />
                 </Grid.Column>
                 <Grid.Column centered textAlign="center">
-                  {favoriteList.find(
-                    (item) => item.imdbID === modalDetails.imdbID
-                  ) ? (
+                  {user && isFavorite ? (
                     <Button
-                      onClick={() => removeFromFavorites(modalDetails.imdbID)}
+                      onClick={() => handleRemoveFavorite(modalDetails.imdbID)}
                       color="red"
+                      disabled={favoriteButtonDisabled.remove}
                     >
                       Remove from favorites
                     </Button>
                   ) : (
                     <Button
-                      onClick={() => addToFavorites(modalDetails)}
+                      onClick={() => handleAddToFavorites(modalDetails)}
                       color="blue"
+                      disabled={favoriteButtonDisabled.add || !user}
                     >
                       Add to favorites
                     </Button>
@@ -136,4 +319,4 @@ const MovieModal = () => {
   )
 }
 
-export default MovieModal
+export default MediaModal

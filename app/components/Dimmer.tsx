@@ -2,12 +2,12 @@
 
 import React from "react"
 
-import useStore from "../../store/store"
 import { Dimmer } from "semantic-ui-react"
+import { sidebarVisibleAtom } from "../../store/store"
+import { useAtom } from "jotai"
 
 const PageDimmer = () => {
-  const sidebarVidisble = useStore((state) => state.sidebarVisible)
-  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
+  const [sidebarVidisble, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
   return (
     <Dimmer

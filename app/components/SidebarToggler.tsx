@@ -1,45 +1,34 @@
 "use client"
 
+import { useAtom } from "jotai"
 import React from "react"
 
-import useStore from "../../store/store"
+import { Button, Icon } from "semantic-ui-react"
+import { sidebarVisibleAtom } from "../../store/store"
 
-import { Button } from "semantic-ui-react"
+import CustomSignInButton from "./CustomSignIn"
+
+import { SignedIn, SignedOut, SignIn, SignInButton } from "@clerk/nextjs"
 
 const SidebarToggler = () => {
-  const sidebarVidisble = useStore((state) => state.sidebarVisible)
-  const setSidebarVisible = useStore((state) => state.setSidebarVisible)
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
-  if (sidebarVidisble) {
-    return (
-      <Button
-        color="grey"
-        className="sidebar-toggle"
-        onClick={() => setSidebarVisible(false)}
-      >
-        Hide favorites
-      </Button>
-    )
-  } else
-    return (
-      <>
+  return (
+    <>
+      <SignedIn>
         <Button
           color="grey"
           className="sidebar-toggle"
           onClick={() => setSidebarVisible(true)}
         >
-          Show favorites
+          <Icon size="large" name="bars"></Icon>
         </Button>
-        <Button
-          icon
-          color="grey"
-          className="sidebar-toggle-sm"
-          onClick={() => setSidebarVisible(true)}
-        >
-          <i className="star icon yellow"></i>
-        </Button>
-      </>
-    )
+      </SignedIn>
+      <SignedOut>
+        <CustomSignInButton />
+      </SignedOut>
+    </>
+  )
 }
 
 export default SidebarToggler

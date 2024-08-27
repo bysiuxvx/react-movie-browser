@@ -1,6 +1,4 @@
-import { SearchItemTypes } from "../../enums/SearchItemTypes"
-
-export interface MovieDetails {
+export type MediaDetails = {
   Title: string
   Year: string
   imdbID: string
@@ -9,7 +7,6 @@ export interface MovieDetails {
   Director: String
   Runtime: string
   Plot: string
-  Type: SearchItemTypes
+  Type: string
   Ratings: { Source: string; Value: string }[]
-  //   Ratings: [Source: string, Value: string]
 }

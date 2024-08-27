@@ -1,76 +1,9 @@
-import create from "zustand"
-import { MovieDetails } from "../types/MovieDetails"
+import { Favorite, Rating } from "@prisma/client"
+import { atom } from "jotai"
+import { MediaDetails } from "../models/MediaDetails"
 
-export interface MovieBrowserStoreState {
-  favoriteList: MovieDetails[]
-  ratedMovies: Record<string, number>
-  searchValue: string
-  sidebarVisible: boolean
-  movieList: MovieDetails[]
-  modalDetails: MovieDetails | null
-
-  setSearchValue: (value: string) => void
-  setMovieList: (list: any[]) => void
-  setModalDetails: (details: MovieDetails | null) => void
-  setSidebarVisible: (value: boolean) => void
-  addUserRating: (rating: Record<string, number>) => void
-  addToFavorites: (movie: MovieDetails) => void
-  removeFromFavorites: (imdbID: string) => void
-}
-
-// const storageFavorites = JSON.parse(
-//   localStorage.getItem("favoriteList") || "[]"
-// )
-// const storageRatesMovies = JSON.parse(
-//   localStorage.getItem("ratedMovies") || "{}"
-// )
-
-let storageFavorites
-try {
-  storageFavorites = JSON.parse(localStorage.getItem("favoriteList") || "[]")
-} catch (error) {
-  console.error("Error parsing favoriteList:", error)
-  storageFavorites = []
-}
-
-let storageRatesMovies
-try {
-  storageRatesMovies = JSON.parse(localStorage.getItem("ratedMovies") || "{}")
-} catch (error) {
-  console.error("Error parsing ratedMovies:", error)
-  storageRatesMovies = {}
-}
-
-const useStore = create<MovieBrowserStoreState>((set) => ({
-  favoriteList: storageFavorites,
-  ratedMovies: storageRatesMovies,
-  searchValue: "",
-  sidebarVisible: false,
-  movieList: [],
-  modalDetails: null,
-
-  setSearchValue: (value: string) => set({ searchValue: value }),
-  setMovieList: (list: any[]) => set({ movieList: list }),
-  setModalDetails: (details: MovieDetails | null) =>
-    set({ modalDetails: details }),
-  setSidebarVisible: (value: boolean) => set({ sidebarVisible: value }),
-
-  addUserRating: (rating: Record<string, number>) => {
-    set({ ratedMovies: rating })
-  },
-
-  addToFavorites: (movie: MovieDetails) => {
-    set((state: MovieBrowserStoreState) => ({
-      favoriteList: [movie, ...state.favoriteList],
-    }))
-  },
-
-  removeFromFavorites: (imdbID: string) =>
-    set((state: MovieBrowserStoreState) => ({
-      favoriteList: state.favoriteList.filter(
-        (movie) => movie.imdbID !== imdbID
-      ),
-    })),
-}))
-
-export default useStore
+export const mediaListAtom = atom<MediaDetails[]>([])
+export const modalDetailsAtom = atom<MediaDetails>()
+export const sidebarVisibleAtom = atom<boolean>(false)
+export const favoritesAtom = atom<Favorite[]>([])
+export const userRatingsAtom = atom<Rating[]>([])

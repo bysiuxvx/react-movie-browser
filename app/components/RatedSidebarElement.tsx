@@ -7,15 +7,15 @@ import { modalDetailsAtom, sidebarVisibleAtom } from "../../store/store"
 
 import { Menu } from "semantic-ui-react"
 import { useAtom } from "jotai"
-import { Favorite } from "@prisma/client"
+import { Rating } from "@prisma/client"
 
-const FavoriteElement = (media: Favorite) => {
+const RatedElement = (ratedItem: Rating) => {
   const [, setModalDetails] = useAtom(modalDetailsAtom)
   const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
 
   const MIN_WINDOW_WIDTH: number = 1440
 
-  const URL: string = `/api/search/id?movieId=${media.itemId}`
+  const URL: string = `/api/search/id?movieId=${ratedItem.itemId}`
 
   const getMediaDetails = async () => {
     try {
@@ -39,9 +39,9 @@ const FavoriteElement = (media: Favorite) => {
 
   return (
     <Menu.Item onClick={() => getMediaDetails()}>
-      {media?.itemName} - {media?.itemYear}
+      {ratedItem?.title} - {ratedItem?.itemYear}
     </Menu.Item>
   )
 }
 
-export default FavoriteElement
+export default RatedElement
