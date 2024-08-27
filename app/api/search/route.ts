@@ -1,7 +1,7 @@
 import axios from "axios"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 
-export async function GET(req) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const searchValue = searchParams.get("query")
   const API_URL: string = `https://www.omdbapi.com/?s=${searchValue}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
