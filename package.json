@@ -9,7 +9,6 @@
     "@types/node": "^17.0.23",
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
-    "axios": "^1.7.5",
     "dotenv": "^16.4.5",
     "include-media": "^1.4.10",
     "jotai": "^2.9.3",

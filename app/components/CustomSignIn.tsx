@@ -1,5 +1,5 @@
 import { SignInButton } from "@clerk/nextjs"
-import React, { FC } from "react"
+import React from "react"
 import { Button } from "semantic-ui-react"
 
 interface CustomSignInButtonProps {

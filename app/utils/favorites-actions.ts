@@ -1,12 +1,16 @@
 import useSWR, { mutate } from "swr"
-import axios from "axios"
 import { MediaDetails } from "../../models/MediaDetails"
-
 import { Favorite } from "@prisma/client"
 
 const FAVORITES_URL = "/api/favorites"
 
-const fetchFavorites = () => axios.get(FAVORITES_URL).then((res) => res.data)
+const fetchFavorites = async () => {
+  const response = await fetch(FAVORITES_URL)
+  if (!response.ok) {
+    throw new Error("Network response was not ok")
+  }
+  return response.json()
+}
 
 export const useFavorites = () => {
   const { data, error } = useSWR(FAVORITES_URL, fetchFavorites) as {
@@ -22,11 +26,20 @@ export const useFavorites = () => {
 
 export const addToFavorites = async (media: MediaDetails) => {
   try {
-    await axios.post(`${FAVORITES_URL}/add`, {
-      itemId: media.imdbID,
-      itemName: media.Title,
-      itemYear: media.Year,
+    const response = await fetch(`${FAVORITES_URL}/add`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        itemId: media.imdbID,
+        itemName: media.Title,
+        itemYear: media.Year,
+      }),
     })
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
     mutate(FAVORITES_URL)
   } catch (error) {
     console.error("Failed to add to favorites:", error)
@@ -36,9 +49,16 @@ export const addToFavorites = async (media: MediaDetails) => {
 
 export const removeFavorite = async (itemId: string) => {
   try {
-    await axios.delete(`${FAVORITES_URL}/remove`, {
-      data: { itemId },
+    const response = await fetch(`${FAVORITES_URL}/remove`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ itemId }),
     })
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
     mutate(FAVORITES_URL)
   } catch (error) {
     console.error("Failed to remove from favorites:", error)

@@ -8,7 +8,6 @@ import { mediaListAtom } from "../../store/store"
 import MediaItem from "./MediaItem"
 
 import { MediaDetails } from "../../models/MediaDetails"
-import { CardGroup } from "semantic-ui-react"
 
 const MediaList = () => {
   const [mediaList] = useAtom(mediaListAtom)

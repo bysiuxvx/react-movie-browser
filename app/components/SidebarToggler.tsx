@@ -8,7 +8,7 @@ import { sidebarVisibleAtom } from "../../store/store"
 
 import CustomSignInButton from "./CustomSignIn"
 
-import { SignedIn, SignedOut, SignIn, SignInButton } from "@clerk/nextjs"
+import { SignedIn, SignedOut } from "@clerk/nextjs"
 
 const SidebarToggler = () => {
   const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
