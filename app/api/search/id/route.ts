@@ -1,4 +1,3 @@
-import axios, { AxiosError } from "axios"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
@@ -8,38 +7,36 @@ export async function GET(request: NextRequest) {
   const API_URL: string = `https://www.omdbapi.com/?i=${movieId}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
 
   try {
-    const response = await axios.get(API_URL)
+    const response = await fetch(API_URL)
 
-    if (response.data && response.data.Response === "True") {
-      return NextResponse.json(response.data, { status: 200 })
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+
+    const data = await response.json()
+
+    if (data && data.Response === "True") {
+      return NextResponse.json(data, { status: 200 })
     } else {
       return NextResponse.json(
         { error: "Movie not found or API returned an error" },
         { status: 404 }
       )
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching media details:", error)
 
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError
-
-      if (axiosError.response) {
+    if (error instanceof Error) {
+      if (error.message.includes("HTTP error")) {
         return NextResponse.json(
-          { error: axiosError.response.data },
-          { status: axiosError.response.status }
-        )
-      } else if (axiosError.request) {
-        return NextResponse.json(
-          { error: "No response received from the API" },
-          { status: 500 }
-        )
-      } else {
-        return NextResponse.json(
-          { error: "An unknown error occurred" },
+          { error: "Failed to fetch data from the API" },
           { status: 500 }
         )
       }
+      return NextResponse.json(
+        { error: error.message || "An unexpected error occurred" },
+        { status: 500 }
+      )
     } else {
       return NextResponse.json(
         { error: "An unexpected error occurred" },
