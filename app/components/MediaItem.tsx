@@ -2,9 +2,10 @@
 
 import React from "react"
 import { modalDetailsAtom } from "../../store/store"
-import { Card, Image, Container } from "semantic-ui-react"
+import { Card, Container } from "semantic-ui-react"
 import { useAtom } from "jotai"
 import { MediaDetails } from "../../models/MediaDetails"
+import Image from "next/image"
 
 const MediaItem = (media: MediaDetails) => {
   const [, setModalDetails] = useAtom(modalDetailsAtom)
@@ -33,10 +34,10 @@ const MediaItem = (media: MediaDetails) => {
       <Container className="media-element-img-container">
         <Image
           src={media.Poster}
-          alt={`poster unavailable`}
-          wrapped
+          alt={`Poster for ${media.Title}`}
+          width={160}
+          height={240}
           className="media-element-img"
-          centered
         />
       </Container>
       <Card.Content>
