@@ -20,11 +20,18 @@ export const useRatings = () => {
   }
 }
 
-export const createRating = async (itemId: string, rating: number) => {
+export const createRating = async (
+  itemId: string,
+  title: string,
+  itemYear: string,
+  rating: number
+) => {
   try {
     await axios.put(`${RATINGS_URL}/add`, {
       itemId,
       rating,
+      title,
+      itemYear,
     })
     mutate(RATINGS_URL)
   } catch (error) {
