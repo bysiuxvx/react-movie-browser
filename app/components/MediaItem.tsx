@@ -6,10 +6,13 @@ import { Card, Container } from "semantic-ui-react"
 import { useAtom } from "jotai"
 import { MediaDetails } from "../../models/MediaDetails"
 import Image from "next/image"
+import { isValidImageUrl } from "../utils/is-valid-url"
 
 const MediaItem = (media: MediaDetails) => {
   const [, setModalDetails] = useAtom(modalDetailsAtom)
   const URL: string = `/api/search/id?movieId=${media.imdbID}`
+
+  const FALLBACK_IMAGE: string = "https://dummyimage.com/160x240/000/fff"
 
   const getMediaDetails = async () => {
     try {
@@ -29,12 +32,14 @@ const MediaItem = (media: MediaDetails) => {
     }
   }
 
+  const imageSrc = isValidImageUrl(media.Poster) ? media.Poster : FALLBACK_IMAGE
+
   return (
     <Card className="media-element" onClick={() => getMediaDetails()}>
       <Container className="media-element-img-container">
         <Image
-          src={media.Poster}
-          alt={`Poster for ${media.Title}`}
+          src={imageSrc}
+          alt={`Poster for ${media?.Title}`}
           width={160}
           height={240}
           className="media-element-img"
