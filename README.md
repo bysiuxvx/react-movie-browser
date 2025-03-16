@@ -18,7 +18,7 @@ The UI library of my choice was [Semantic UI](https://react.semantic-ui.com/).
 
 The app is live on Vercel. For the full experience sign in by creating your own user, or try it out with the test user, credentials below.
 
-[Vercel](https://react-movie-browser-1rwsy4njx-bysiuxvxs-projects.vercel.app)
+[Vercel](https://react-movie-browser-seven.vercel.app/)
 
 - Username: **test**
 - Password: **test**
