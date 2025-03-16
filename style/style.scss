@@ -145,6 +145,13 @@ $breakpoints: (
   }
 }
 
+.media-not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $component-bg;
+}
+
 .user-button {
   margin-top: 15px;
 }
