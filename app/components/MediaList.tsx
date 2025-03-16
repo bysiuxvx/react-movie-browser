@@ -10,8 +10,8 @@ import MediaItem from "./MediaItem"
 import { MediaDetails } from "../../models/MediaDetails"
 
 const MediaList = () => {
-  const [mediaList] = useAtom(mediaListAtom)
-  const [mediaNotFound] = useAtom(mediaNotFoundAtom)
+  const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
+  const [mediaNotFound] = useAtom<boolean>(mediaNotFoundAtom)
 
   return (
     <>
