@@ -12,7 +12,7 @@ import { SearchItemTypes } from "../../enums/SearchItemTypes"
 const Search = () => {
   const [searchValue, setSearchValue] = useState<string>("")
   const [, setMediaList] = useAtom<MediaDetails[]>(mediaListAtom)
-  const [, setMediaNotFound] = useAtom<boolean | null>(mediaNotFoundAtom)
+  const [, setMediaNotFound] = useAtom<boolean>(mediaNotFoundAtom)
 
   const API_URL: string = `/api/search?query=${searchValue}`
   const DEBOUNCE_TIME: number = 500
