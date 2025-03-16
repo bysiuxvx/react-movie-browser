@@ -4,7 +4,7 @@ import { useAtom } from "jotai"
 import React, { useCallback, useEffect, useState } from "react"
 
 import { Input, Container, Icon } from "semantic-ui-react"
-import { mediaListAtom } from "../../store/store"
+import { mediaListAtom, mediaNotFoundAtom } from "../../store/store"
 import { MediaDetails } from "../../models/MediaDetails"
 import debounce from "lodash.debounce"
 import { SearchItemTypes } from "../../enums/SearchItemTypes"
@@ -12,6 +12,7 @@ import { SearchItemTypes } from "../../enums/SearchItemTypes"
 const Search = () => {
   const [searchValue, setSearchValue] = useState<string>("")
   const [, setMediaList] = useAtom<MediaDetails[]>(mediaListAtom)
+  const [, setMediaNotFound] = useAtom<boolean | null>(mediaNotFoundAtom)
 
   const API_URL: string = `/api/search?query=${searchValue}`
   const DEBOUNCE_TIME: number = 500
@@ -19,8 +20,10 @@ const Search = () => {
   const fetchMediaData = useCallback(() => {
     fetch(API_URL)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok")
+        if (response.status === 404) {
+          setMediaList([])
+          setMediaNotFound(true)
+          return
         }
         return response.json()
       })
@@ -29,9 +32,16 @@ const Search = () => {
           (media: MediaDetails) => media.Type !== SearchItemTypes.GAME
         )
         setMediaList(filteredMedia)
+        setMediaNotFound(false)
       })
       .catch((error) => console.error("Fetch error:", error))
   }, [searchValue])
+
+  const clearSearch = (): void => {
+    setSearchValue("")
+    setMediaList([])
+    setMediaNotFound(false)
+  }
 
   useEffect(() => {
     if (!searchValue) {
@@ -57,13 +67,7 @@ const Search = () => {
         placeholder="Search for a movie or series :)"
         icon={
           searchValue ? (
-            <Icon
-              name="remove"
-              inverted
-              circular
-              link
-              onClick={() => setSearchValue("")}
-            />
+            <Icon name="remove" inverted circular link onClick={clearSearch} />
           ) : null
         }
       />
