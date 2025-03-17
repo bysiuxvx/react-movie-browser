@@ -96,7 +96,7 @@ const UserSidebar = () => {
               cursor: ratings?.length ? "pointer" : "default",
             }}
           >
-            <Icon name="dropdown" />
+            {ratings?.length ? <Icon name="dropdown" /> : null}
             Reviewed {`(${ratings?.length || 0})`}
           </AccordionTitle>
           <AccordionContent
