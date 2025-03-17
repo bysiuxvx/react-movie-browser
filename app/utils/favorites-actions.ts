@@ -1,6 +1,7 @@
 import useSWR, { mutate } from "swr"
 import { MediaDetails } from "../../models/MediaDetails"
 import { Favorite } from "@prisma/client"
+import { useUser } from "@clerk/nextjs"
 
 const FAVORITES_URL = "/api/favorites"
 
@@ -13,7 +14,12 @@ const fetchFavorites = async () => {
 }
 
 export const useFavorites = () => {
-  const { data, error } = useSWR(FAVORITES_URL, fetchFavorites) as {
+  const { user } = useUser()
+
+  const { data, error } = useSWR(
+    user ? FAVORITES_URL : null,
+    fetchFavorites
+  ) as {
     data: { favorites: Favorite[] }
     error: any
   }
