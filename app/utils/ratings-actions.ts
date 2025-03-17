@@ -1,5 +1,6 @@
 import useSWR, { mutate } from "swr"
 import { Rating } from "@prisma/client"
+import { useUser } from "@clerk/nextjs"
 
 const RATINGS_URL = "/api/ratings"
 
@@ -12,7 +13,9 @@ const fetchRatings = async () => {
 }
 
 export const useRatings = () => {
-  const { data, error } = useSWR(RATINGS_URL, fetchRatings) as {
+  const { user } = useUser()
+
+  const { data, error } = useSWR(user ? RATINGS_URL : null, fetchRatings) as {
     data: { ratings: Rating[] }
     error: any
   }
