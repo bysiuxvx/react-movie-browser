@@ -222,6 +222,11 @@ const MediaModal = () => {
                 <strong>Runtime:</strong> {modalDetails.Runtime}
               </p>
               <p>{modalDetails.Plot}</p>
+              {modalDetails.Awards && modalDetails.Awards !== NOT_AVAILABLE && (
+                <p>
+                  <strong>Awards:</strong> {modalDetails.Awards}
+                </p>
+              )}
               {modalDetails.Ratings ? (
                 <List divided relaxed>
                   {modalDetails.Ratings?.map((rating, i) => (
