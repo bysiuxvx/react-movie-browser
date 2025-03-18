@@ -8,5 +8,6 @@ export type MediaDetails = {
   Runtime: string
   Plot: string
   Type: string
+  Awards: string
   Ratings: { Source: string; Value: string }[]
 }

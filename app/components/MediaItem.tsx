@@ -12,7 +12,7 @@ const MediaItem = (media: MediaDetails) => {
   const [, setModalDetails] = useAtom(modalDetailsAtom)
   const URL: string = `/api/search/id?movieId=${media.imdbID}`
 
-  const FALLBACK_IMAGE: string = "https://dummyimage.com/160x240/000/fff"
+  const FALLBACK_IMAGE: string = "https://picsum.photos/160/240/?blur=10"
 
   const getMediaDetails = async () => {
     try {

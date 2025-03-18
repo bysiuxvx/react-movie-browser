@@ -36,6 +36,7 @@ import { MediaDetails } from "../../models/MediaDetails"
 
 import toast from "react-hot-toast"
 import { useUser } from "@clerk/nextjs"
+import { isValidImageUrl } from "../utils/is-valid-url"
 
 const MediaModal = () => {
   const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
@@ -60,6 +61,8 @@ const MediaModal = () => {
   } = useRatings()
 
   const DEBOUNCE_TIME: number = 350
+  const NOT_AVAILABLE: string = "N/A"
+  const FALLBACK_IMAGE: string = "https://picsum.photos/200/300/?blur=10"
 
   const handleAddToFavorites = async (modalDetails: MediaDetails) => {
     setFavoritebuttonDisabled((prevState) => ({
@@ -194,12 +197,16 @@ const MediaModal = () => {
       ? ratings.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
       : null
 
+  const imageSrc = isValidImageUrl(modalDetails?.Poster)
+    ? modalDetails?.Poster
+    : FALLBACK_IMAGE
+
   return (
     <>
       {modalDetails && (
         <Modal onClose={() => setModalDetails(undefined)} open={!!modalDetails}>
           <Modal.Content image>
-            <Image size="big" src={modalDetails.Poster} wrapped />
+            <Image size="big" src={imageSrc} wrapped />
             <Modal.Description>
               <Header>
                 {modalDetails.Title} {modalDetails.Year}{" "}
@@ -215,6 +222,11 @@ const MediaModal = () => {
                 <strong>Runtime:</strong> {modalDetails.Runtime}
               </p>
               <p>{modalDetails.Plot}</p>
+              {modalDetails.Awards && modalDetails.Awards !== NOT_AVAILABLE && (
+                <p>
+                  <strong>Awards:</strong> {modalDetails.Awards}
+                </p>
+              )}
               {modalDetails.Ratings ? (
                 <List divided relaxed>
                   {modalDetails.Ratings?.map((rating, i) => (
