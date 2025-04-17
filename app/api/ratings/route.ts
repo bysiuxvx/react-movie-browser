@@ -1,9 +1,25 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
+import {NextRequest, NextResponse} from "next/server"
+import {getAuth} from "@clerk/nextjs/server"
 import prisma from "../../utils/prisma-client"
 import createUser from "../../utils/create-user"
 
-export async function GET(req: NextRequest) {
+type RatingsResponse = {
+  ratings: Array<{
+    id: string
+    userId: string
+    itemId: string
+    title: string
+    itemYear: string
+    rating: number
+    createdAt: Date
+  }> | undefined
+}
+
+type ErrorResponse = {
+  error: string
+}
+
+export async function GET(req: NextRequest): Promise<NextResponse<RatingsResponse | ErrorResponse>> {
   const { userId } = getAuth(req)
 
   if (!userId) {
@@ -11,29 +27,32 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    let user = await prisma.user.findUnique({
-      where: {
-        clerkId: userId,
-      },
-    })
-
-    if (!user) {
-      user = await createUser(userId)
-    }
-
-    const userWithRatings = await prisma.user.findUnique({
+    let userWithRatings = await prisma.user.findUnique({
       where: { clerkId: userId },
       include: {
-        ratings: {},
+        ratings: true,
       },
     })
+
+    if (!userWithRatings) {
+      await createUser(userId)
+      userWithRatings = await prisma.user.findUnique({
+        where: { clerkId: userId },
+        include: {
+          ratings: true,
+        },
+      })
+    }
 
     return NextResponse.json(
       { ratings: userWithRatings?.ratings },
       { status: 200 }
     )
-  } catch (error: any) {
+  } catch (error) {
     console.error("error: ", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "An unknown error occurred" },
+      { status: 500 }
+    )
   }
 }
