@@ -1,9 +1,17 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
-import { PrismaClient } from "@prisma/client"
+import {NextRequest, NextResponse} from "next/server"
+import {getAuth} from "@clerk/nextjs/server"
+import {PrismaClient} from "@prisma/client"
+import {z} from "zod"
 import createUser from "../../../utils/create-user"
 
 const prisma = new PrismaClient()
+
+const RatingSchema = z.object({
+  itemId: z.string(),
+  rating: z.number().min(1).max(10),
+  title: z.string().min(1),
+  itemYear: z.string()
+})
 
 export async function PUT(req: NextRequest) {
   const { userId } = getAuth(req)
@@ -13,7 +21,17 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    const { itemId, rating, title, itemYear } = await req.json()
+    const body = await req.json()
+    const validationResult = RatingSchema.safeParse(body)
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { error: "Invalid request data", details: validationResult.error.flatten() },
+        { status: 400 }
+      )
+    }
+
+    const { itemId, rating, title, itemYear } = validationResult.data
 
     let user = await prisma.user.findUnique({
       where: {
@@ -27,7 +45,6 @@ export async function PUT(req: NextRequest) {
       console.log("New user created:", user)
     }
 
-    // Ensure user exists
     if (!user.id) {
       return NextResponse.json(
         { error: "Failed to create or find user." },
