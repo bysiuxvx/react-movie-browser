@@ -1,25 +1,41 @@
-import { NextRequest, NextResponse } from "next/server"
+import {NextRequest, NextResponse} from "next/server"
+
+interface OmdbResponse {
+  Response: string
+  Error?: string
+  [key: string]: any
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const movieId = searchParams.get("movieId")
 
-  const API_URL: string = `https://www.omdbapi.com/?i=${movieId}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
+  if (!movieId) {
+    return NextResponse.json(
+      { error: "Movie ID is required" },
+      { status: 400 }
+    )
+  }
+
+  const BASE_URL: string = process.env.OMDB_API_URL || 'https://www.omdbapi.com'
+  const API_URL: string = `${BASE_URL}/?i=${movieId}&apikey=${process.env.NEXT_PUBLIC_API_KEY}`
 
   try {
-    const response = await fetch(API_URL)
+    const response = await fetch(API_URL, {
+      next: { revalidate: 3600 }
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`)
     }
 
-    const data = await response.json()
+    const data: OmdbResponse = await response.json()
 
     if (data && data.Response === "True") {
       return NextResponse.json(data, { status: 200 })
     } else {
       return NextResponse.json(
-        { error: "Movie not found or API returned an error" },
+        { error: data.Error || "Movie not found or API returned an error" },
         { status: 404 }
       )
     }
