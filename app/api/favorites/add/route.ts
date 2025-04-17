@@ -1,48 +1,53 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getAuth } from "@clerk/nextjs/server"
-import { PrismaClient } from "@prisma/client"
-import createUser from "../../../utils/create-user"
+import {NextRequest, NextResponse} from "next/server"
+import {getAuth} from "@clerk/nextjs/server"
+import prisma from "../../../utils/prisma-client"
+import {z} from "zod"
 
-const prisma = new PrismaClient()
+const favoriteSchema = z.object({
+  itemId: z.string(),
+  itemName: z.string(),
+  itemYear: z.string(),
+})
 
 export async function POST(req: NextRequest) {
   const { userId } = getAuth(req)
 
   if (!userId) {
-    return NextResponse.json({ error: "User ID is missing" }, { status: 400 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    const { itemId, itemName, itemYear } = await req.json()
+    const body = await req.json()
+    const validatedData = favoriteSchema.parse(body)
 
-    let user = await prisma.user.findUnique({
-      where: {
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
         clerkId: userId,
+        createdAt: new Date(),
       },
     })
 
-    if (!user) {
-      user = await createUser(userId)
-    }
-
     const favorite = await prisma.favorite.create({
       data: {
-        itemId,
-        itemName,
-        itemYear,
+        ...validatedData,
         userId: user.id,
       },
     })
 
-    return NextResponse.json(
-      { message: "Favorite added successfully!", favorite },
-      { status: 200 }
-    )
+    return NextResponse.json({ favorite }, { status: 200 })
   } catch (error) {
-    console.error("Error adding favorite: ", error)
-    return NextResponse.json(
-      { error: "Failed to add favorite" },
-      { status: 500 }
-    )
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ 
+        error: "Invalid request data",
+        details: error.errors 
+      }, { status: 400 })
+    }
+
+    console.error("Favorites API Error:", error)
+    return NextResponse.json({ 
+      error: "Failed to add favorite" 
+    }, { status: 500 })
   }
 }
