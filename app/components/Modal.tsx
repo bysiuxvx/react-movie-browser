@@ -1,42 +1,23 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from "react"
+import React, {useCallback, useEffect, useState} from "react"
 
-import { useAtom } from "jotai"
-import { modalDetailsAtom } from "../../store/store"
+import {useAtom} from "jotai"
+import {modalDetailsAtom} from "../../store/store"
 
 import debounce from "lodash.debounce"
 
-import {
-  createRating,
-  removeRating,
-  useRatings,
-} from "../utils/ratings-actions"
+import {createRating, removeRating, useRatings,} from "../utils/ratings-actions"
 
-import {
-  addToFavorites,
-  removeFavorite,
-  useFavorites,
-} from "../utils/favorites-actions"
+import {addToFavorites, removeFavorite, useFavorites,} from "../utils/favorites-actions"
 
-import {
-  Button,
-  Header,
-  Image,
-  Modal,
-  Divider,
-  Grid,
-  Segment,
-  Label,
-  Rating,
-  Icon,
-  List,
-} from "semantic-ui-react"
-import { MediaDetails } from "../../models/MediaDetails"
+import {Button, Divider, Grid, Header, Icon, Image, Label, List, Modal, Rating, Segment,} from "semantic-ui-react"
+import {MediaDetails} from "../../models/MediaDetails"
 
 import toast from "react-hot-toast"
-import { useUser } from "@clerk/nextjs"
-import { isValidImageUrl } from "../utils/is-valid-url"
+import {useUser} from "@clerk/nextjs"
+import {isValidImageUrl} from "../utils/is-valid-url"
+import {CreateRating} from "../../models/create-rating";
 
 const MediaModal = () => {
   const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
@@ -116,15 +97,17 @@ const MediaModal = () => {
   }, [modalDetails])
 
   const debouncedHandleRateMedia = useCallback(
-    debounce(async (value: number) => {
+    debounce(async (newRatingValue: number) => {
+      const updatedRating: CreateRating = {
+        itemId: modalDetails?.imdbID ?? '',
+        title: modalDetails?.Title ?? '',
+        itemYear: modalDetails?.Year ?? '',
+        rating: newRatingValue,
+      }
+
       try {
         await toast.promise(
-          createRating(
-            modalDetails!.imdbID,
-            modalDetails!.Title,
-            modalDetails!.Year,
-            value
-          ),
+          createRating(updatedRating),
           {
             loading: "⏱️ Rating...",
             success: <b>👏 Successfully rated!</b>,
@@ -132,10 +115,7 @@ const MediaModal = () => {
           }
         )
       } catch (error) {
-        console.error("Error adding to ratings:", error)
-        const previousRating =
-          ratings.find((item) => item.itemId === modalDetails!.imdbID)
-            ?.rating || 0
+        const previousRating: number = ratings.find(rating => rating.itemId === modalDetails?.imdbID)?.rating ?? 0
         setOptimisticRating(previousRating)
       } finally {
         setRatingDisabled(false)

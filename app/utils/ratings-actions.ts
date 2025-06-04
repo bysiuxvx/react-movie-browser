@@ -1,6 +1,7 @@
-import useSWR, { mutate } from "swr"
-import { Rating } from "@prisma/client"
-import { useUser } from "@clerk/nextjs"
+import useSWR, {mutate} from "swr"
+import {Rating} from "@prisma/client"
+import {useUser} from "@clerk/nextjs"
+import {CreateRating} from "../../models/create-rating";
 
 const RATINGS_URL = "/api/ratings"
 
@@ -26,11 +27,7 @@ export const useRatings = () => {
   }
 }
 
-export const createRating = async (
-  itemId: string,
-  title: string,
-  itemYear: string,
-  rating: number
+export const createRating = async (newRating: CreateRating
 ) => {
   try {
     const response = await fetch(`${RATINGS_URL}/add`, {
@@ -38,12 +35,7 @@ export const createRating = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        itemId,
-        rating,
-        title,
-        itemYear,
-      }),
+      body: JSON.stringify(newRating),
     })
     if (!response.ok) {
       throw new Error("Network response was not ok")
