@@ -1,39 +1,35 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getAuth } from "@clerk/nextjs/server"
 import prisma from "../../utils/prisma-client"
-import createUser from "../../utils/create-user"
 
 export async function GET(req: NextRequest) {
   const { userId } = getAuth(req)
 
   if (!userId) {
-    return NextResponse.json({ error: "User ID is missing" }, { status: 400 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
-    let user = await prisma.user.findUnique({
-      where: {
-        clerkId: userId,
-      },
-    })
-
-    if (!user) {
-      user = await createUser(userId)
-    }
-
-    const userWithFavorites = await prisma.user.findUnique({
+    const userWithFavorites = await prisma.user.upsert({
       where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        createdAt: new Date(),
+      },
       include: {
-        favorites: {},
+        favorites: true,
       },
     })
 
-    return NextResponse.json(
-      { favorites: userWithFavorites?.favorites },
-      { status: 200 }
-    )
-  } catch (error: any) {
-    console.error("error: ", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ 
+      favorites: userWithFavorites.favorites 
+    }, { status: 200 })
+
+  } catch (error) {
+    console.error("Favorites API Error:", error)
+    return NextResponse.json({ 
+      error: "Failed to fetch favorites" 
+    }, { status: 500 })
   }
 }
