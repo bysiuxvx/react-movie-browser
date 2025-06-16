@@ -22,7 +22,8 @@
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5",
     "swr": "^2.2.5",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "zod": "^3.24.3"
   },
   "scripts": {
     "dev": "next dev",
