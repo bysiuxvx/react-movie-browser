@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
   const cachedData = await redis.get(cacheKey);
 
   if (cachedData) {
-    console.log('Cache hit');
     return NextResponse.json(JSON.parse(cachedData), { status: 200 });
   }
 
