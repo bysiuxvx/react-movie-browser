@@ -14,7 +14,7 @@ The UI library of my choice was [Semantic UI](https://react.semantic-ui.com/).
 <br>
 **2024 update**: yet another migration out of boredom... The app is now built in Next.js, database and user authentication have been added on top of other improvements. Replaced axios with fetch to benefit from Next.js's caching. The UI has not changed or improved much, because I was not **THAT** bored...
 <br>
-**2025 update**: on top of several minor improvements and bug fixes, added Redis for caching to prevent OMDb API rate limits.
+**2025 update**: Added URL-based routing for modals, enabling direct linking to specific titles. Also implemented Redis for caching to prevent OMDb API rate limits and made several minor improvements and bug fixes.
 
 ## Demo
 
