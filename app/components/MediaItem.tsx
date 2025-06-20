@@ -6,14 +6,23 @@ import { MediaDetails } from '../../models/MediaDetails';
 import Image from 'next/image';
 import { isValidImageUrl } from '../utils/is-valid-url';
 import Link from 'next/link';
+import { usePrefetchOnHover } from '../hooks/usePrefetchOnHover';
 
 const MediaItem = (media: MediaDetails) => {
   const FALLBACK_IMAGE: string = 'https://picsum.photos/160/240/?blur=10';
   const imageSrc = isValidImageUrl(media.Poster) ? media.Poster : FALLBACK_IMAGE;
   const href = `?media=${media.imdbID}`;
 
+  const { onMouseEnter, onMouseLeave } = usePrefetchOnHover(media.imdbID);
+
   return (
-    <Link href={href} scroll={false} className="media-element-link">
+    <Link 
+      href={href} 
+      scroll={false} 
+      className="media-element-link"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <Card className="media-element">
         <Container className="media-element-img-container">
           <Image

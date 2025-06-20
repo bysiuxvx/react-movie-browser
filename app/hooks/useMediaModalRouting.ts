@@ -3,6 +3,22 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { modalDetailsAtom } from '../../store/store';
 import toast from 'react-hot-toast';
+import useSWR from 'swr';
+import { MediaDetails } from '../../models/MediaDetails';
+
+interface FetchError extends Error {
+  status?: number;
+}
+
+const fetcher = async (url: string) => {
+  const res = await fetch(url);
+  if (!res.ok) {
+    const error = new Error('An error occurred while fetching the data.') as FetchError;
+    error.status = res.status;
+    throw error;
+  }
+  return res.json();
+};
 
 export const useMediaModalRouting = () => {
   const [modalDetails, setModalDetails] = useAtom(modalDetailsAtom);
@@ -10,52 +26,32 @@ export const useMediaModalRouting = () => {
   const searchParams = useSearchParams();
   const mediaId = searchParams.get('media');
 
-  const displayErrorToast = useCallback(() => {
-    toast.error('Media not found. Check the id?', {
-      duration: 3000,
-    });
-  }, [toast.error]);
-
-  const fetchMediaDetails = useCallback(
-    async (id: string) => {
-      try {
-        const response = await fetch(`/api/search/id/${id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setModalDetails(data);
-          return true;
-        } else if (response.status === 404) {
-          setModalDetails(undefined);
+  const { data, error, isLoading } = useSWR<MediaDetails>(
+    mediaId ? `/api/search/id/${mediaId}` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      shouldRetryOnError: false,
+      onError: (err: unknown) => {
+        console.error('Error fetching media details:', err);
+        const error = err as FetchError;
+        if (error.status === 404) {
+          toast.error('Media not found. Check the id?', { duration: 3000 });
           const newSearchParams = new URLSearchParams(searchParams.toString());
           newSearchParams.delete('media');
           router.replace(`?${newSearchParams.toString()}`, { scroll: false });
         }
-      } catch (error) {
-        console.error('Error fetching media details:', error);
-        setModalDetails(undefined);
-        return false;
-      }
-    },
-    [setModalDetails, searchParams, router]
+      },
+    }
   );
 
   useEffect(() => {
-    if (mediaId) {
-      if (!modalDetails || modalDetails.imdbID !== mediaId) {
-        fetchMediaDetails(mediaId)
-          .then((success) => {
-            if (!success) {
-              displayErrorToast();
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to fetch media details:', error);
-          });
-      }
-    } else {
+    if (data) {
+      setModalDetails(data);
+    } else if (!mediaId) {
       setModalDetails(undefined);
     }
-  }, [mediaId, modalDetails, setModalDetails, fetchMediaDetails]);
+  }, [data, mediaId, setModalDetails]);
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -64,16 +60,12 @@ export const useMediaModalRouting = () => {
 
       if (!mediaId) {
         setModalDetails(undefined);
-      } else if (modalDetails?.imdbID !== mediaId) {
-        fetchMediaDetails(mediaId).catch((error) => {
-          console.error('Failed to fetch media details in popstate:', error);
-        });
       }
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [modalDetails, setModalDetails, fetchMediaDetails]);
+  }, [setModalDetails]);
 
   const handleClose = useCallback(() => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
