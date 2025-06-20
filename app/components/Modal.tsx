@@ -1,100 +1,104 @@
-"use client"
+'use client';
 
-import React, {useCallback, useEffect, useState} from "react"
+import React, { useCallback, useEffect, useState } from 'react';
 
-import {useAtom} from "jotai"
-import {modalDetailsAtom} from "../../store/store"
+import { useAtom } from 'jotai';
+import { modalDetailsAtom } from '../../store/store';
 
-import debounce from "lodash.debounce"
+import debounce from 'lodash.debounce';
 
-import {createRating, removeRating, useRatings,} from "../utils/ratings-actions"
+import { createRating, removeRating, useRatings } from '../utils/ratings-actions';
 
-import {addToFavorites, removeFavorite, useFavorites,} from "../utils/favorites-actions"
+import { addToFavorites, removeFavorite, useFavorites } from '../utils/favorites-actions';
 
-import {Button, Divider, Grid, Header, Icon, Image, Label, List, Modal, Rating, Segment,} from "semantic-ui-react"
-import {MediaDetails} from "../../models/MediaDetails"
+import {
+  Button,
+  Divider,
+  Grid,
+  Header,
+  Icon,
+  Image,
+  Label,
+  List,
+  Modal,
+  Rating,
+  Segment,
+} from 'semantic-ui-react';
+import { MediaDetails } from '../../models/MediaDetails';
 
-import toast from "react-hot-toast"
-import {useUser} from "@clerk/nextjs"
-import {isValidImageUrl} from "../utils/is-valid-url"
-import {CreateRating} from "../../models/create-rating";
+import toast from 'react-hot-toast';
+import { useUser } from '@clerk/nextjs';
+import { isValidImageUrl } from '../utils/is-valid-url';
+import { CreateRating } from '../../models/create-rating';
 
 const MediaModal = () => {
   const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
     add: false,
     remove: false,
-  })
-  const [ratingDisabled, setRatingDisabled] = useState(false)
-  const [optimisticRating, setOptimisticRating] = useState<number | null>(null)
-  const [isDragging, setIsDragging] = useState(false)
-  const [tempRating, setTempRating] = useState<number | null>(null)
-  const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(
-    modalDetailsAtom
-  )
+  });
+  const [ratingDisabled, setRatingDisabled] = useState(false);
+  const [optimisticRating, setOptimisticRating] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [tempRating, setTempRating] = useState<number | null>(null);
+  const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(modalDetailsAtom);
 
-  const { user } = useUser()
+  const { user } = useUser();
 
-  const { favorites, isLoading, isError } = useFavorites()
-  const {
-    ratings,
-    isLoading: ratingsIsLoading,
-    isError: ratingsIsError,
-  } = useRatings()
+  const { favorites, isLoading, isError } = useFavorites();
+  const { ratings, isLoading: ratingsIsLoading, isError: ratingsIsError } = useRatings();
 
-  const DEBOUNCE_TIME: number = 350
-  const NOT_AVAILABLE: string = "N/A"
-  const FALLBACK_IMAGE: string = "https://picsum.photos/200/300/?blur=10"
+  const DEBOUNCE_TIME: number = 350;
+  const NOT_AVAILABLE: string = 'N/A';
+  const FALLBACK_IMAGE: string = 'https://picsum.photos/200/300/?blur=10';
 
   const handleAddToFavorites = async (modalDetails: MediaDetails) => {
     setFavoritebuttonDisabled((prevState) => ({
       add: true,
       remove: false,
-    }))
+    }));
     try {
       toast.promise(addToFavorites(modalDetails), {
-        loading: "⏱️ Adding...",
+        loading: '⏱️ Adding...',
         success: <b>👏 Successfully added to favorites!</b>,
         error: <b>Could not add...</b>,
-      })
+      });
     } catch (error) {
       setFavoritebuttonDisabled((prevState) => ({
         add: false,
         remove: false,
-      }))
-      console.error("Error adding to favorites:", error)
+      }));
+      console.error('Error adding to favorites:', error);
     }
-  }
+  };
 
   const handleRemoveFavorite = async (itemId: string) => {
     setFavoritebuttonDisabled((prevState) => ({
       add: false,
       remove: true,
-    }))
+    }));
     try {
       toast.promise(removeFavorite(itemId), {
-        loading: "⏱️ Removing...",
+        loading: '⏱️ Removing...',
         success: <b>🗑️ Successfully removed from favorites!</b>,
         error: <b>Could not remove...</b>,
-      })
+      });
     } catch (error) {
       setFavoritebuttonDisabled((prevState) => ({
         add: false,
         remove: false,
-      }))
-      console.error("Error removing from favorites:", error)
+      }));
+      console.error('Error removing from favorites:', error);
     }
-  }
+  };
 
-  const isFavorite = favorites?.find(
-    (item) => item.itemId === modalDetails?.imdbID
-  )
+  const isFavorite = favorites?.find((item) => item.itemId === modalDetails?.imdbID);
 
   useEffect(() => {
     setFavoritebuttonDisabled((prevState) => ({
       add: false,
       remove: false,
-    }))
-  }, [modalDetails])
+    }));
+  }, [modalDetails]);
 
   const debouncedHandleRateMedia = useCallback(
     debounce(async (newRatingValue: number) => {
@@ -103,83 +107,78 @@ const MediaModal = () => {
         title: modalDetails?.Title ?? '',
         itemYear: modalDetails?.Year ?? '',
         rating: newRatingValue,
-      }
+      };
 
       try {
-        await toast.promise(
-          createRating(updatedRating),
-          {
-            loading: "⏱️ Rating...",
-            success: <b>👏 Successfully rated!</b>,
-            error: <b>Could not rate...</b>,
-          }
-        )
+        await toast.promise(createRating(updatedRating), {
+          loading: '⏱️ Rating...',
+          success: <b>👏 Successfully rated!</b>,
+          error: <b>Could not rate...</b>,
+        });
       } catch (error) {
-        const previousRating: number = ratings.find(rating => rating.itemId === modalDetails?.imdbID)?.rating ?? 0
-        setOptimisticRating(previousRating)
+        const previousRating: number =
+          ratings.find((rating) => rating.itemId === modalDetails?.imdbID)?.rating ?? 0;
+        setOptimisticRating(previousRating);
       } finally {
-        setRatingDisabled(false)
+        setRatingDisabled(false);
       }
     }, DEBOUNCE_TIME),
     [modalDetails, ratings]
-  )
+  );
 
   const handleMouseUp = () => {
     if (isDragging && tempRating !== null) {
-      handleRateMedia(tempRating)
-      setIsDragging(false)
+      handleRateMedia(tempRating);
+      setIsDragging(false);
     }
-  }
+  };
 
   const handleRateMedia = (rating: number) => {
     if (rating === 0) {
-      handleRemoveRating(modalDetails!.imdbID)
-      return
+      handleRemoveRating(modalDetails!.imdbID);
+      return;
     }
 
-    setOptimisticRating(rating)
-    setTempRating(rating)
-    debouncedHandleRateMedia(rating)
-  }
+    setOptimisticRating(rating);
+    setTempRating(rating);
+    debouncedHandleRateMedia(rating);
+  };
 
   const handleRemoveRating = async (itemId: string) => {
-    setRatingDisabled(true)
+    setRatingDisabled(true);
     try {
       await toast.promise(removeRating(itemId), {
-        loading: "⏱️ Removing...",
+        loading: '⏱️ Removing...',
         success: <b>🗑️ Successfully removed from ratings!</b>,
         error: <b>Could not remove...</b>,
-      })
+      });
     } catch (error) {
-      console.error("Error removing from ratings:", error)
+      console.error('Error removing from ratings:', error);
     } finally {
-      setRatingDisabled(false)
+      setRatingDisabled(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (!user) {
-      setOptimisticRating(null)
-      setTempRating(null)
-      return
+      setOptimisticRating(null);
+      setTempRating(null);
+      return;
     }
     if (modalDetails) {
       const existingRating =
-        ratings.find((item) => item.itemId === modalDetails.imdbID)?.rating ||
-        null
-      setOptimisticRating(existingRating)
-      setTempRating(existingRating)
+        ratings.find((item) => item.itemId === modalDetails.imdbID)?.rating || null;
+      setOptimisticRating(existingRating);
+      setTempRating(existingRating);
     }
-  }, [modalDetails, ratings])
+  }, [modalDetails, ratings]);
 
   const userRatingForCurrentMedia =
     user && modalDetails
       ? ratings.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
-      : null
+      : null;
 
-  const imageSrc = isValidImageUrl(modalDetails?.Poster)
-    ? modalDetails?.Poster
-    : FALLBACK_IMAGE
+  const imageSrc = isValidImageUrl(modalDetails?.Poster) ? modalDetails?.Poster : FALLBACK_IMAGE;
 
   return (
     <>
@@ -189,7 +188,7 @@ const MediaModal = () => {
             <Image size="big" src={imageSrc} wrapped />
             <Modal.Description>
               <Header>
-                {modalDetails.Title} {modalDetails.Year}{" "}
+                {modalDetails.Title} {modalDetails.Year}{' '}
                 <div className="ui horizontal label">{modalDetails.Type}</div>
               </Header>
               <p>
@@ -224,10 +223,7 @@ const MediaModal = () => {
           <Modal.Actions>
             {!user && (
               <Segment basic textAlign="center">
-                <h4>
-                  Please log in to rate and save your favorite movies and
-                  series!
-                </h4>
+                <h4>Please log in to rate and save your favorite movies and series!</h4>
               </Segment>
             )}
             <Segment>
@@ -256,28 +252,18 @@ const MediaModal = () => {
                     type="range"
                     min={0}
                     max={10}
-                    value={
-                      tempRating !== null
-                        ? tempRating
-                        : userRatingForCurrentMedia || 0
-                    }
+                    value={tempRating !== null ? tempRating : userRatingForCurrentMedia || 0}
                     disabled={ratingDisabled || !user}
                     onMouseDown={() => setIsDragging(true)}
                     onMouseUp={handleMouseUp}
-                    onChange={(event) =>
-                      setTempRating(Number(event.target.value))
-                    }
+                    onChange={(event) => setTempRating(Number(event.target.value))}
                   />
                   <br />
                   <br />
                   <Rating
                     className="star-rating"
                     icon="star"
-                    rating={
-                      tempRating !== null
-                        ? tempRating
-                        : userRatingForCurrentMedia || 0
-                    }
+                    rating={tempRating !== null ? tempRating : userRatingForCurrentMedia || 0}
                     disabled={ratingDisabled}
                     maxRating={10}
                   />
@@ -308,7 +294,7 @@ const MediaModal = () => {
         </Modal>
       )}
     </>
-  )
-}
+  );
+};
 
-export default MediaModal
+export default MediaModal;
