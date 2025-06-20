@@ -33,11 +33,11 @@ const MediaItem = (media: MediaDetails) => {
       newSearchParams.set('media', data.imdbID);
       router.push(`?${newSearchParams.toString()}`, { scroll: false });
     } catch (error: any) {
-      console.log('Error fetching media details:', error);
+      console.error('Error fetching media details:', error);
       if (error instanceof Error) {
-        console.log(`Error: ${error.message}`);
+        console.error(`Error: ${error.message}`);
       } else {
-        console.log('An unexpected error occurred. Please try again later.');
+        console.error('An unexpected error occurred. Please try again later.');
       }
     }
   };

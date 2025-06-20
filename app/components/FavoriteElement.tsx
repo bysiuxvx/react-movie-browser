@@ -38,9 +38,9 @@ const FavoriteElement = (media: Favorite) => {
       console.error('Error fetching media details:', error);
 
       if (error instanceof Error) {
-        console.log(`Error: ${error.message || 'Failed to fetch movie details'}`);
+        console.error(`Error: ${error.message || 'Failed to fetch movie details'}`);
       } else {
-        console.log('An unexpected error occurred. Please try again later.');
+        console.error('An unexpected error occurred. Please try again later.');
       }
     }
   };

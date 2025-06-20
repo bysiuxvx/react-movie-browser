@@ -1,55 +1,52 @@
-import {NextRequest, NextResponse} from "next/server"
-import {getAuth} from "@clerk/nextjs/server"
-import {PrismaClient} from "@prisma/client"
-import {z} from "zod"
-import createUser from "../../../utils/create-user"
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuth } from '@clerk/nextjs/server';
+import { PrismaClient } from '@prisma/client';
+import { z } from 'zod';
+import createUser from '../../../utils/create-user';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const RatingSchema = z.object({
   itemId: z.string(),
   rating: z.number().min(1).max(10),
   title: z.string().min(1),
-  itemYear: z.string()
-})
+  itemYear: z.string(),
+});
 
 export async function PUT(req: NextRequest) {
-  const { userId } = getAuth(req)
+  const { userId } = getAuth(req);
 
   if (!userId) {
-    return NextResponse.json({ error: "User ID is missing" }, { status: 400 })
+    return NextResponse.json({ error: 'User ID is missing' }, { status: 400 });
   }
 
   try {
-    const body = await req.json()
-    const validationResult = RatingSchema.safeParse(body)
+    const body = await req.json();
+    const validationResult = RatingSchema.safeParse(body);
 
     if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Invalid request data", details: validationResult.error.flatten() },
+        { error: 'Invalid request data', details: validationResult.error.flatten() },
         { status: 400 }
-      )
+      );
     }
 
-    const { itemId, rating, title, itemYear } = validationResult.data
+    const { itemId, rating, title, itemYear } = validationResult.data;
 
     let user = await prisma.user.findUnique({
       where: {
         clerkId: userId,
       },
-    })
+    });
 
     if (!user) {
-      console.log("User not found. Creating new user...")
-      user = await createUser(userId)
-      console.log("New user created:", user)
+      console.error('User not found. Creating new user...');
+      user = await createUser(userId);
+      console.error('New user created:', user);
     }
 
     if (!user.id) {
-      return NextResponse.json(
-        { error: "Failed to create or find user." },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to create or find user.' }, { status: 500 });
     }
 
     const existingRating = await prisma.rating.findUnique({
@@ -59,9 +56,9 @@ export async function PUT(req: NextRequest) {
           itemId,
         },
       },
-    })
+    });
 
-    let result
+    let result;
 
     if (existingRating) {
       result = await prisma.rating.update({
@@ -71,7 +68,7 @@ export async function PUT(req: NextRequest) {
         data: {
           rating,
         },
-      })
+      });
     } else {
       result = await prisma.rating.create({
         data: {
@@ -81,12 +78,12 @@ export async function PUT(req: NextRequest) {
           title,
           itemYear,
         },
-      })
+      });
     }
 
-    return NextResponse.json(result, { status: 200 })
+    return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
-    console.error("Error in PUT handler:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    console.error('Error in PUT handler:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
