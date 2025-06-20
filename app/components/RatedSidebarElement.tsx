@@ -14,7 +14,7 @@ const RatedElement = (ratedItem: Rating) => {
   const [, setSidebarVisible] = useAtom(sidebarVisibleAtom);
 
   const MIN_WINDOW_WIDTH: number = 1440;
-  const URL: string = `/api/search/id?movieId=${ratedItem.itemId}`;
+  const URL: string = `/api/search/id/${ratedItem.itemId}`;
 
   const handleClick = async () => {
     try {

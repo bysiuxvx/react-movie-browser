@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 const MediaItem = (media: MediaDetails) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const URL: string = `/api/search/id?movieId=${media.imdbID}`;
+  const URL: string = `/api/search/id/${media.imdbID}`;
 
   const FALLBACK_IMAGE: string = 'https://picsum.photos/160/240/?blur=10';
 
