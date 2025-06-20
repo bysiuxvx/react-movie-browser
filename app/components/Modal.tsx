@@ -1,16 +1,12 @@
 'use client';
 
 import React, { useCallback, useEffect, useState } from 'react';
-
+import { useMediaModalRouting } from '../hooks/useMediaModalRouting';
 import { useAtom } from 'jotai';
 import { modalDetailsAtom } from '../../store/store';
-
 import debounce from 'lodash.debounce';
-
 import { createRating, removeRating, useRatings } from '../utils/ratings-actions';
-
 import { addToFavorites, removeFavorite, useFavorites } from '../utils/favorites-actions';
-
 import {
   Button,
   Divider,
@@ -25,14 +21,13 @@ import {
   Segment,
 } from 'semantic-ui-react';
 import { MediaDetails } from '../../models/MediaDetails';
-
 import toast from 'react-hot-toast';
 import { useUser } from '@clerk/nextjs';
 import { isValidImageUrl } from '../utils/is-valid-url';
 import { CreateRating } from '../../models/create-rating';
 
 const MediaModal = () => {
-  const [favoriteButtonDisabled, setFavoritebuttonDisabled] = useState({
+  const [favoriteButtonDisabled, setFavoriteButtonDisabled] = useState({
     add: false,
     remove: false,
   });
@@ -42,17 +37,17 @@ const MediaModal = () => {
   const [tempRating, setTempRating] = useState<number | null>(null);
   const [modalDetails, setModalDetails] = useAtom<MediaDetails | undefined>(modalDetailsAtom);
 
+  const { handleClose, mediaId } = useMediaModalRouting();
   const { user } = useUser();
-
   const { favorites, isLoading, isError } = useFavorites();
   const { ratings, isLoading: ratingsIsLoading, isError: ratingsIsError } = useRatings();
 
-  const DEBOUNCE_TIME: number = 350;
-  const NOT_AVAILABLE: string = 'N/A';
-  const FALLBACK_IMAGE: string = 'https://picsum.photos/200/300/?blur=10';
+  const DEBOUNCE_TIME = 350;
+  const NOT_AVAILABLE = 'N/A';
+  const FALLBACK_IMAGE = 'https://picsum.photos/200/300/?blur=10';
 
   const handleAddToFavorites = async (modalDetails: MediaDetails) => {
-    setFavoritebuttonDisabled((prevState) => ({
+    setFavoriteButtonDisabled((prevState) => ({
       add: true,
       remove: false,
     }));
@@ -63,7 +58,7 @@ const MediaModal = () => {
         error: <b>Could not add...</b>,
       });
     } catch (error) {
-      setFavoritebuttonDisabled((prevState) => ({
+      setFavoriteButtonDisabled((prevState) => ({
         add: false,
         remove: false,
       }));
@@ -72,7 +67,7 @@ const MediaModal = () => {
   };
 
   const handleRemoveFavorite = async (itemId: string) => {
-    setFavoritebuttonDisabled((prevState) => ({
+    setFavoriteButtonDisabled((prevState) => ({
       add: false,
       remove: true,
     }));
@@ -83,7 +78,7 @@ const MediaModal = () => {
         error: <b>Could not remove...</b>,
       });
     } catch (error) {
-      setFavoritebuttonDisabled((prevState) => ({
+      setFavoriteButtonDisabled((prevState) => ({
         add: false,
         remove: false,
       }));
@@ -94,7 +89,7 @@ const MediaModal = () => {
   const isFavorite = favorites?.find((item) => item.itemId === modalDetails?.imdbID);
 
   useEffect(() => {
-    setFavoritebuttonDisabled((prevState) => ({
+    setFavoriteButtonDisabled((prevState) => ({
       add: false,
       remove: false,
     }));
@@ -117,7 +112,7 @@ const MediaModal = () => {
         });
       } catch (error) {
         const previousRating: number =
-          ratings.find((rating) => rating.itemId === modalDetails?.imdbID)?.rating ?? 0;
+          ratings?.find((rating) => rating.itemId === modalDetails?.imdbID)?.rating ?? 0;
         setOptimisticRating(previousRating);
       } finally {
         setRatingDisabled(false);
@@ -126,16 +121,16 @@ const MediaModal = () => {
     [modalDetails, ratings]
   );
 
-  const handleMouseUp = () => {
+  const handleMouseUp = async () => {
     if (isDragging && tempRating !== null) {
-      handleRateMedia(tempRating);
+      await handleRateMedia(tempRating);
       setIsDragging(false);
     }
   };
 
-  const handleRateMedia = (rating: number) => {
+  const handleRateMedia = async (rating: number) => {
     if (rating === 0) {
-      handleRemoveRating(modalDetails!.imdbID);
+      await handleRemoveRating(modalDetails!.imdbID);
       return;
     }
 
@@ -167,7 +162,7 @@ const MediaModal = () => {
     }
     if (modalDetails) {
       const existingRating =
-        ratings.find((item) => item.itemId === modalDetails.imdbID)?.rating || null;
+        ratings?.find((item) => item.itemId === modalDetails.imdbID)?.rating || null;
       setOptimisticRating(existingRating);
       setTempRating(existingRating);
     }
@@ -175,15 +170,17 @@ const MediaModal = () => {
 
   const userRatingForCurrentMedia =
     user && modalDetails
-      ? ratings.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
+      ? ratings?.find((rating) => rating.itemId === modalDetails.imdbID)?.rating
       : null;
 
   const imageSrc = isValidImageUrl(modalDetails?.Poster) ? modalDetails?.Poster : FALLBACK_IMAGE;
 
+  const isOpen = !!modalDetails || !!mediaId;
+
   return (
-    <>
+    <Modal open={isOpen} onClose={handleClose}>
       {modalDetails && (
-        <Modal onClose={() => setModalDetails(undefined)} open={!!modalDetails}>
+        <>
           <Modal.Content image>
             <Image size="big" src={imageSrc} wrapped />
             <Modal.Description>
@@ -291,9 +288,9 @@ const MediaModal = () => {
               <Divider vertical />
             </Segment>
           </Modal.Actions>
-        </Modal>
+        </>
       )}
-    </>
+    </Modal>
   );
 };
 

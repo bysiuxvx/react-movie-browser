@@ -1,46 +1,38 @@
-"use client"
+'use client';
 
-import React from "react"
-import {modalDetailsAtom, sidebarVisibleAtom} from "../../store/store"
-import {Menu} from "semantic-ui-react"
-import {useAtom} from "jotai"
-import {Favorite} from "@prisma/client"
+import React from 'react';
+import { sidebarVisibleAtom } from '../../store/store';
+import { Menu } from 'semantic-ui-react';
+import { useAtom } from 'jotai';
+import { Favorite } from '@prisma/client';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const FavoriteElement = (media: Favorite) => {
-  const [modalDetails, setModalDetails] = useAtom(modalDetailsAtom)
-  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const MIN_WINDOW_WIDTH: number = 1440
-  const URL: string = `/api/search/id?movieId=${media.itemId}`
+  const MIN_WINDOW_WIDTH: number = 1440;
+  const href = `?media=${media.itemId}`;
 
-  const getMediaDetails = async () => {
-    if (modalDetails?.imdbID === media.itemId) return
-    try {
-      const response = await fetch(URL)
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-      const data = await response.json()
-      setModalDetails(data)
-      if (window.innerWidth < MIN_WINDOW_WIDTH) setSidebarVisible(false)
-    } catch (error: any) {
-      console.error("Error fetching media details:", error)
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
 
-      if (error instanceof Error) {
-        console.log(
-          `Error: ${error.message || "Failed to fetch movie details"}`
-        )
-      } else {
-        console.log("An unexpected error occurred. Please try again later.")
-      }
+    if (window.innerWidth < MIN_WINDOW_WIDTH) {
+      setSidebarVisible(false);
     }
-  }
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('media', media.itemId);
+    router.push(`?${params.toString()}`);
+  };
 
   return (
-    <Menu.Item onClick={() => getMediaDetails()}>
+    <Menu.Item as={Link} href={href} onClick={handleClick}>
       {media?.itemName} - {media?.itemYear}
     </Menu.Item>
-  )
-}
+  );
+};
 
-export default FavoriteElement
+export default FavoriteElement;
