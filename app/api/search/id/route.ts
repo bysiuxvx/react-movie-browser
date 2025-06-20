@@ -9,9 +9,20 @@ interface OmdbResponse {
 }
 
 export async function GET(request: NextRequest) {
-  const redisUrl = process.env.REDIS_URL!;
-  const redis = new Redis(redisUrl);
+  console.log('REDIS_URL exists:', !!process.env.REDIS_URL);
+  console.log('REDIS_URL starts with:', process.env.REDIS_URL?.substring(0, 10) + '...');
 
+  const redisUrl = process.env.REDIS_URL!;
+  const redis = new Redis(redisUrl, {
+    tls: {
+      rejectUnauthorized: false, // Needed for some Redis providers
+    },
+    connectTimeout: 10000, // 10 seconds
+    retryStrategy: (times) => {
+      const delay: number = Math.min(times * 50, 2000);
+      return delay;
+    },
+  });
   const { searchParams } = new URL(request.url);
   const movieId = searchParams.get('movieId');
 
@@ -19,9 +30,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Movie ID is required' }, { status: 400 });
   }
 
+  console.log('Movie ID: ', movieId);
   const cacheKey = `movie:${movieId}`;
   const cachedData = await redis.get(cacheKey);
 
+  console.log(cachedData);
   if (cachedData) {
     return NextResponse.json(JSON.parse(cachedData), { status: 200 });
   }
