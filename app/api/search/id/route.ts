@@ -9,7 +9,7 @@ interface OmdbResponse {
 }
 
 export async function GET(request: NextRequest) {
-  const redisUrl = process.env.NEXT_PUBLIC_REDIS_URL!;
+  const redisUrl = process.env.REDIS_URL!;
   const redis = new Redis(redisUrl);
 
   const { searchParams } = new URL(request.url);
@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
   const cachedData = await redis.get(cacheKey);
 
   if (cachedData) {
+    console.log('Cache hit');
     return NextResponse.json(JSON.parse(cachedData), { status: 200 });
   }
 
