@@ -9,9 +9,6 @@ interface OmdbResponse {
 }
 
 export async function GET(request: NextRequest) {
-  console.log('REDIS_URL exists:', !!process.env.REDIS_URL);
-  console.log('REDIS_URL starts with:', process.env.REDIS_URL?.substring(0, 10) + '...');
-
   const redisUrl = process.env.REDIS_URL!;
   const redis = new Redis(redisUrl, {
     tls: {
@@ -30,12 +27,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Movie ID is required' }, { status: 400 });
   }
 
-  console.log('Movie ID: ', movieId);
   const cacheKey = `movie:${movieId}`;
   const cachedData = await redis.get(cacheKey);
 
   if (cachedData) {
-    console.log('Cache hit');
     return NextResponse.json(JSON.parse(cachedData), { status: 200 });
   }
 
@@ -53,7 +48,6 @@ export async function GET(request: NextRequest) {
 
     if (data && data.Response === 'True') {
       await redis.set(cacheKey, JSON.stringify(data), 'EX', CacheTtl.ONE_WEEK);
-      console.log('Cache miss, fetched from API');
       return NextResponse.json(data, { status: 200 });
     } else {
       return NextResponse.json(
