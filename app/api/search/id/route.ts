@@ -34,8 +34,8 @@ export async function GET(request: NextRequest) {
   const cacheKey = `movie:${movieId}`;
   const cachedData = await redis.get(cacheKey);
 
-  console.log(cachedData);
   if (cachedData) {
+    console.log('Cache hit');
     return NextResponse.json(JSON.parse(cachedData), { status: 200 });
   }
 
@@ -53,6 +53,7 @@ export async function GET(request: NextRequest) {
 
     if (data && data.Response === 'True') {
       await redis.set(cacheKey, JSON.stringify(data), 'EX', CacheTtl.ONE_WEEK);
+      console.log('Cache miss, fetched from API');
       return NextResponse.json(data, { status: 200 });
     } else {
       return NextResponse.json(
