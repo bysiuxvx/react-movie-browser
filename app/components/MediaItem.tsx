@@ -1,41 +1,51 @@
-"use client"
+'use client';
 
-import React from "react"
-import { modalDetailsAtom } from "../../store/store"
-import { Card, Container } from "semantic-ui-react"
-import { useAtom } from "jotai"
-import { MediaDetails } from "../../models/MediaDetails"
-import Image from "next/image"
-import { isValidImageUrl } from "../utils/is-valid-url"
+import React from 'react';
+import { Card, Container } from 'semantic-ui-react';
+import { MediaDetails } from '../../models/MediaDetails';
+import Image from 'next/image';
+import { isValidImageUrl } from '../utils/is-valid-url';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const MediaItem = (media: MediaDetails) => {
-  const [, setModalDetails] = useAtom(modalDetailsAtom)
-  const URL: string = `/api/search/id?movieId=${media.imdbID}`
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const URL: string = `/api/search/id?movieId=${media.imdbID}`;
 
-  const FALLBACK_IMAGE: string = "https://picsum.photos/160/240/?blur=10"
+  const FALLBACK_IMAGE: string = 'https://picsum.photos/160/240/?blur=10';
 
-  const getMediaDetails = async () => {
+  const handleClick = async () => {
     try {
-      const response = await fetch(URL)
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
+      if (media.imdbID) {
+        const newSearchParams = new URLSearchParams(searchParams.toString());
+        newSearchParams.set('media', media.imdbID);
+        router.push(`?${newSearchParams.toString()}`, { scroll: false });
+        return;
       }
-      const data = await response.json()
-      setModalDetails(data)
+
+      const response = await fetch(URL);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set('media', data.imdbID);
+      router.push(`?${newSearchParams.toString()}`, { scroll: false });
     } catch (error: any) {
-      console.log("Error fetching media details:", error)
+      console.log('Error fetching media details:', error);
       if (error instanceof Error) {
-        console.log(`Error: ${error.message}`)
+        console.log(`Error: ${error.message}`);
       } else {
-        console.log("An unexpected error occurred. Please try again later.")
+        console.log('An unexpected error occurred. Please try again later.');
       }
     }
-  }
+  };
 
-  const imageSrc = isValidImageUrl(media.Poster) ? media.Poster : FALLBACK_IMAGE
+  const imageSrc = isValidImageUrl(media.Poster) ? media.Poster : FALLBACK_IMAGE;
 
   return (
-    <Card className="media-element" onClick={() => getMediaDetails()}>
+    <Card className="media-element" onClick={handleClick}>
       <Container className="media-element-img-container">
         <Image
           src={imageSrc}
@@ -47,12 +57,13 @@ const MediaItem = (media: MediaDetails) => {
       </Container>
       <Card.Content>
         <Card.Header>{media.Title}</Card.Header>
+        <Card.Meta>{media.Year}</Card.Meta>
         <Card.Description>
           <p>{media.Year}</p>
         </Card.Description>
       </Card.Content>
     </Card>
-  )
-}
+  );
+};
 
-export default MediaItem
+export default MediaItem;

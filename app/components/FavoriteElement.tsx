@@ -1,46 +1,55 @@
-"use client"
+'use client';
 
-import React from "react"
-import {modalDetailsAtom, sidebarVisibleAtom} from "../../store/store"
-import {Menu} from "semantic-ui-react"
-import {useAtom} from "jotai"
-import {Favorite} from "@prisma/client"
+import React from 'react';
+import { modalDetailsAtom, sidebarVisibleAtom } from '../../store/store';
+import { Menu } from 'semantic-ui-react';
+import { useAtom } from 'jotai';
+import { Favorite } from '@prisma/client';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const FavoriteElement = (media: Favorite) => {
-  const [modalDetails, setModalDetails] = useAtom(modalDetailsAtom)
-  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [modalDetails, setModalDetails] = useAtom(modalDetailsAtom);
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom);
 
-  const MIN_WINDOW_WIDTH: number = 1440
-  const URL: string = `/api/search/id?movieId=${media.itemId}`
+  const MIN_WINDOW_WIDTH: number = 1440;
+  const URL: string = `/api/search/id?movieId=${media.itemId}`;
 
-  const getMediaDetails = async () => {
-    if (modalDetails?.imdbID === media.itemId) return
+  const handleClick = async () => {
     try {
-      const response = await fetch(URL)
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.set('media', media.itemId);
+      router.push(`?${newSearchParams.toString()}`, { scroll: false });
+
+      if (window.innerWidth < MIN_WINDOW_WIDTH) {
+        setSidebarVisible(false);
       }
-      const data = await response.json()
-      setModalDetails(data)
-      if (window.innerWidth < MIN_WINDOW_WIDTH) setSidebarVisible(false)
+
+      if (modalDetails?.imdbID !== media.itemId) {
+        const response = await fetch(URL);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setModalDetails(data);
+      }
     } catch (error: any) {
-      console.error("Error fetching media details:", error)
+      console.error('Error fetching media details:', error);
 
       if (error instanceof Error) {
-        console.log(
-          `Error: ${error.message || "Failed to fetch movie details"}`
-        )
+        console.log(`Error: ${error.message || 'Failed to fetch movie details'}`);
       } else {
-        console.log("An unexpected error occurred. Please try again later.")
+        console.log('An unexpected error occurred. Please try again later.');
       }
     }
-  }
+  };
 
   return (
-    <Menu.Item onClick={() => getMediaDetails()}>
+    <Menu.Item onClick={handleClick}>
       {media?.itemName} - {media?.itemYear}
     </Menu.Item>
-  )
-}
+  );
+};
 
-export default FavoriteElement
+export default FavoriteElement;
