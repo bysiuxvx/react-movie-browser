@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Redis from 'ioredis';
-import { CacheTtl } from '../../../../enums/cache-ttl';
+import { CacheTtl } from '../../../../../enums/cache-ttl';
 
 interface OmdbResponse {
   Response: string;
@@ -8,20 +8,23 @@ interface OmdbResponse {
   [key: string]: any;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const redisUrl = process.env.REDIS_URL!;
   const redis = new Redis(redisUrl, {
     tls: {
-      rejectUnauthorized: false, // Needed for some Redis providers
+      rejectUnauthorized: false,
     },
-    connectTimeout: 10000, // 10 seconds
+    connectTimeout: 10000,
     retryStrategy: (times) => {
       const delay: number = Math.min(times * 50, 2000);
       return delay;
     },
   });
-  const { searchParams } = new URL(request.url);
-  const movieId = searchParams.get('movieId');
+
+  const movieId = params.id;
 
   if (!movieId) {
     return NextResponse.json({ error: 'Movie ID is required' }, { status: 400 });
@@ -51,23 +54,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(data, { status: 200 });
     } else {
       return NextResponse.json(
-        { error: data.Error || 'Movie not found or API returned an error' },
+        { error: data.Error || 'Movie not found' },
         { status: 404 }
       );
     }
-  } catch (error: any) {
-    console.error('Error fetching media details:', error);
-
-    if (error instanceof Error) {
-      if (error.message.includes('HTTP error')) {
-        return NextResponse.json({ error: 'Failed to fetch data from the API' }, { status: 500 });
-      }
-      return NextResponse.json(
-        { error: error.message || 'An unexpected error occurred' },
-        { status: 500 }
-      );
-    } else {
-      return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
-    }
+  } catch (error) {
+    console.error('Error fetching movie details:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch movie details' },
+      { status: 500 }
+    );
+  } finally {
+    await redis.quit();
   }
 }
