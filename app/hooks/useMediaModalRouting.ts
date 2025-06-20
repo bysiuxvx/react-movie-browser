@@ -2,12 +2,19 @@ import { useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAtom } from 'jotai';
 import { modalDetailsAtom } from '../../store/store';
+import toast from 'react-hot-toast';
 
 export const useMediaModalRouting = () => {
   const [modalDetails, setModalDetails] = useAtom(modalDetailsAtom);
   const router = useRouter();
   const searchParams = useSearchParams();
   const mediaId = searchParams.get('media');
+
+  const displayErrorToast = useCallback(() => {
+    toast.error('Media not found. Check the id?', {
+      duration: 3000,
+    });
+  }, [toast.error]);
 
   const fetchMediaDetails = useCallback(
     async (id: string) => {
@@ -16,20 +23,34 @@ export const useMediaModalRouting = () => {
         if (response.ok) {
           const data = await response.json();
           setModalDetails(data);
+          return true;
+        } else if (response.status === 404) {
+          setModalDetails(undefined);
+          const newSearchParams = new URLSearchParams(searchParams.toString());
+          newSearchParams.delete('media');
+          router.replace(`?${newSearchParams.toString()}`, { scroll: false });
         }
       } catch (error) {
         console.error('Error fetching media details:', error);
+        setModalDetails(undefined);
+        return false;
       }
     },
-    [setModalDetails]
+    [setModalDetails, searchParams, router]
   );
 
   useEffect(() => {
     if (mediaId) {
       if (!modalDetails || modalDetails.imdbID !== mediaId) {
-        fetchMediaDetails(mediaId).catch((error) => {
-          console.error('Failed to fetch media details:', error);
-        });
+        fetchMediaDetails(mediaId)
+          .then((success) => {
+            if (!success) {
+              displayErrorToast();
+            }
+          })
+          .catch((error) => {
+            console.error('Failed to fetch media details:', error);
+          });
       }
     } else {
       setModalDetails(undefined);
