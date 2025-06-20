@@ -1,8 +1,8 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { preload } from 'swr';
 
 export const usePrefetchOnHover = (mediaId: string) => {
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<number | null>(null);
   const PREFETCH_DELAY = 300; // ms
 
   const prefetchMedia = useCallback(async () => {
@@ -14,16 +14,28 @@ export const usePrefetchOnHover = (mediaId: string) => {
   }, [mediaId]);
 
   const handleMouseEnter = useCallback(() => {
-    timeoutRef.current = setTimeout(() => {
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = window.setTimeout(() => {
       prefetchMedia().catch(console.error);
     }, PREFETCH_DELAY);
   }, [prefetchMedia]);
 
   const handleMouseLeave = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   return {
