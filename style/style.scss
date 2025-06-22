@@ -32,9 +32,6 @@ $breakpoints: (
     position: fixed;
     left: 50px;
     top: 50px;
-    @include media("<tablet") {
-      display: none;
-    }
   }
   button.button.ui.sidebar-toggle-sm {
     position: fixed;
@@ -42,9 +39,6 @@ $breakpoints: (
     top: 65px;
     @include media("<phone") {
       left: 10px;
-    }
-    @include media(">=tablet") {
-      display: none;
     }
   }
 }
