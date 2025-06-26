@@ -3,7 +3,7 @@ import { preload } from 'swr';
 
 export const usePrefetchOnHover = (mediaId: string) => {
   const timeoutRef = useRef<number | null>(null);
-  const PREFETCH_DELAY = 300; // ms
+  const PREFETCH_DELAY = 300;
 
   const prefetchMedia = useCallback(async () => {
     if (!mediaId) return;
