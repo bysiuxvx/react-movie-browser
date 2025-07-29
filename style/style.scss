@@ -22,23 +22,38 @@ $breakpoints: (
   justify-content: center;
   align-items: center;
   text-align: center;
-  min-width: 100vw;
   min-height: 100vh;
-  overflow: hidden;
   background-color: $main-bg;
   position: relative;
+  overflow-x: hidden;
+  
+  @include media("<tablet") {
+    justify-content: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
 
   button.button.ui.sidebar-toggle {
     position: fixed;
     left: 50px;
     top: 50px;
-  }
-  button.button.ui.sidebar-toggle-sm {
-    position: fixed;
-    left: 30px;
-    top: 65px;
-    @include media("<phone") {
+
+    @include media("<tablet") {
       left: 10px;
+      top: 10px;
+      z-index: 1001;
+      position: fixed;
+      transition: transform 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i.icon {
+        margin: 0 !important;
+        color: white !important;
+      }
     }
   }
 }
@@ -49,13 +64,37 @@ $breakpoints: (
 }
 
 .search-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  
+  @include media("<tablet") {
+    //position: sticky;
+    background: $main-bg;
+    z-index: 1000;
+    margin: 20px;
+  }
+  
   .search-input {
-    border-radius: 30px;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+    
+    @include media("<tablet") {
+      width: 100%;
+      max-width: 100%;
+    }
+
     input {
-      width: 300px;
+      width: 100%;
       transition: 0.5s;
       background-color: $component-bg;
       border-radius: 30px;
+      margin: 0;
+      padding: 10px 15px;
+      box-sizing: border-box;
+
       &::placeholder {
         color: #000;
       }
@@ -64,12 +103,28 @@ $breakpoints: (
 }
 
 .list-container {
-  height: fit-content;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: center;
-  overflow: auto;
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  
+  @include media("<tablet") {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 15px;
+    padding: 10px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+  }
 
   @include media("<tablet") {
     flex-direction: row;
@@ -102,16 +157,18 @@ $breakpoints: (
     width: 45vw;
   }
 
-  .ui.card:first-child,
   .ui.card:last-child {
     margin: 20px;
   }
 
   .media-element {
-    height: 370px;
-    width: 220px;
-    margin: 20px;
-    justify-content: end;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 320px;
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0;
     transition: 0.2s;
     cursor: pointer;
     background-color: $component-bg;
@@ -120,8 +177,10 @@ $breakpoints: (
     }
 
     .media-element-img-container {
+      width: 100%;
       padding: 10px;
-      width: 170px;
+      display: flex;
+      justify-content: center;
 
       .media-element-img {
         object-fit: cover;
