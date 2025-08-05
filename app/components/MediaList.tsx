@@ -1,17 +1,17 @@
-"use client"
+'use client';
 
-import React from "react"
+import React from 'react';
 
-import { useAtom } from "jotai"
-import { mediaListAtom, mediaNotFoundAtom } from "../../store/store"
+import { useAtom, useAtomValue } from 'jotai';
+import { mediaListAtom, mediaNotFoundAtom } from '../../store/store';
 
-import MediaItem from "./MediaItem"
+import MediaItem from './MediaItem';
 
-import { MediaDetails } from "../../models/MediaDetails"
+import { MediaDetails } from '../../models/MediaDetails';
 
 const MediaList = () => {
-  const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
-  const [mediaNotFound] = useAtom<boolean>(mediaNotFoundAtom)
+  const mediaList: MediaDetails[] = useAtomValue<MediaDetails[]>(mediaListAtom);
+  const [mediaNotFound] = useAtom<boolean>(mediaNotFoundAtom);
 
   return (
     <>
@@ -29,7 +29,7 @@ const MediaList = () => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default MediaList
+export default MediaList;
