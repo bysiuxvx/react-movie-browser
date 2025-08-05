@@ -11,7 +11,11 @@ interface FetchError extends Error {
 }
 
 const fetcher = async (url: string) => {
-  const res = await fetch(url);
+  const res = await fetch(url, {
+    headers: {
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });
   if (!res.ok) {
     const error = new Error('An error occurred while fetching the data.') as FetchError;
     error.status = res.status;
@@ -26,12 +30,14 @@ export const useMediaModalRouting = () => {
   const searchParams = useSearchParams();
   const mediaId = searchParams.get('media');
 
-  const { data, error, isLoading } = useSWR<MediaDetails>(
+  const { data, error, isLoading, mutate } = useSWR<MediaDetails>(
     mediaId ? `/api/search/id/${mediaId}` : null,
     fetcher,
     {
       revalidateOnFocus: false,
       shouldRetryOnError: false,
+      revalidateIfStale: false,
+      revalidateOnMount: !modalDetails || modalDetails.imdbID !== mediaId,
       onError: (err: unknown) => {
         console.error('Error fetching media details:', err);
         const error = err as FetchError;

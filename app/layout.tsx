@@ -7,6 +7,7 @@ import { Toaster, ToasterProps } from 'react-hot-toast';
 
 import { Analytics } from '@vercel/analytics/next';
 import '../style/style.scss';
+import { SWRProvider } from './utils/swr-provider';
 
 export const metadata: Metadata = {
   title: 'Movie and series browser',
@@ -30,11 +31,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <body className="App">
           <Analytics />
-          <div>
-            <Toaster {...toasterProps} />
-          </div>
-          <header></header>
-          <main>{children}</main>
+          <SWRProvider>
+            <div>
+              <Toaster {...toasterProps} />
+            </div>
+            <header></header>
+            <main>{children}</main>
+          </SWRProvider>
         </body>
       </html>
     </ClerkProvider>
