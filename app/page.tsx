@@ -1,42 +1,37 @@
-"use client"
+'use client';
 
-import React, { useEffect } from "react"
+import React, { useEffect } from 'react';
 
-import { useAtom } from "jotai"
-import {
-  favoritesAtom,
-  mediaListAtom,
-  sidebarVisibleAtom,
-  userRatingsAtom,
-} from "../store/store"
+import { useAtom, useAtomValue } from 'jotai';
+import { favoritesAtom, mediaListAtom, sidebarVisibleAtom, userRatingsAtom } from '../store/store';
 
-import { MediaDetails } from "../models/MediaDetails"
-import { useUser } from "@clerk/nextjs"
+import { MediaDetails } from '../models/MediaDetails';
+import { useUser } from '@clerk/nextjs';
 
-import UserSidebar from "./components/UserSidebar"
-import MediaList from "./components/MediaList"
-import SidebarToggler from "./components/SidebarToggler"
-import PageDimmer from "./components/Dimmer"
-import Search from "./components/Search"
-import MediaModal from "./components/Modal"
+import UserSidebar from './components/UserSidebar';
+import MediaList from './components/MediaList';
+import SidebarToggler from './components/SidebarToggler';
+import PageDimmer from './components/Dimmer';
+import Search from './components/Search';
+import MediaModal from './components/Modal';
 
-import { Segment } from "semantic-ui-react"
+import { Segment } from 'semantic-ui-react';
 
 const HomePage = () => {
-  const [mediaList] = useAtom<MediaDetails[]>(mediaListAtom)
-  const { user } = useUser()
+  const mediaList: MediaDetails[] = useAtomValue<MediaDetails[]>(mediaListAtom);
+  const { user } = useUser();
 
-  const [, setFavorites] = useAtom(favoritesAtom)
-  const [, setRatings] = useAtom(userRatingsAtom)
-  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom)
+  const [, setFavorites] = useAtom(favoritesAtom);
+  const [, setRatings] = useAtom(userRatingsAtom);
+  const [, setSidebarVisible] = useAtom(sidebarVisibleAtom);
 
   useEffect(() => {
     if (!user) {
-      setFavorites([])
-      setRatings([])
-      setSidebarVisible(false)
+      setFavorites([]);
+      setRatings([]);
+      setSidebarVisible(false);
     }
-  }, [user, setFavorites, setRatings, setSidebarVisible])
+  }, [user, setFavorites, setRatings, setSidebarVisible]);
 
   return (
     <>
@@ -55,7 +50,7 @@ const HomePage = () => {
       </Segment>
       <PageDimmer />
     </>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;
