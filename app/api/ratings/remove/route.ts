@@ -23,15 +23,15 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Invalid item ID" }, { status: 400 })
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.upsert({
       where: {
         clerkId: userId,
       },
+      update: {},
+      create: {
+        clerkId: userId
+      },
     })
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
-    }
 
     const deletedRating = await prisma.$transaction(async (tx) => {
       const rating = await tx.rating.findFirst({

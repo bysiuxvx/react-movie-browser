@@ -27,22 +27,16 @@ export async function GET(req: NextRequest): Promise<NextResponse<RatingsRespons
   }
 
   try {
-    let userWithRatings = await prisma.user.findUnique({
+    const userWithRatings = await prisma.user.upsert({
       where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId
+      },
       include: {
         ratings: true,
       },
     })
-
-    if (!userWithRatings) {
-      await createUser(userId)
-      userWithRatings = await prisma.user.findUnique({
-        where: { clerkId: userId },
-        include: {
-          ratings: true,
-        },
-      })
-    }
 
     return NextResponse.json(
       { ratings: userWithRatings?.ratings },
