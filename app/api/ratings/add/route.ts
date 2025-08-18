@@ -33,17 +33,17 @@ export async function PUT(req: NextRequest) {
 
     const { itemId, rating, title, itemYear } = validationResult.data;
 
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.upsert({
       where: {
+        clerkId: userId,
+      },
+      update: {},
+      create: {
         clerkId: userId,
       },
     });
 
-    if (!user) {
-      console.error('User not found. Creating new user...');
-      user = await createUser(userId);
-      console.error('New user created:', user);
-    }
+    console.error('New user created:', user);
 
     if (!user.id) {
       return NextResponse.json({ error: 'Failed to create or find user.' }, { status: 500 });
